@@ -39,10 +39,7 @@ animation:mover 20s linear infinite;
 
 .container{margin-top:120px;}
 
-.logo{
-width:220px;
-margin-top:10px;
-}
+.logo{width:220px;margin-top:10px;}
 
 .card{
 background:rgba(255,255,255,0.95);
@@ -117,7 +114,17 @@ text-decoration:none;
 font-weight:bold;
 }
 
-#qr{margin-top:10px;}
+.qr-container{
+display:flex;
+justify-content:center;
+gap:20px;
+flex-wrap:wrap;
+margin-top:10px;
+}
+
+.qr-box{text-align:center;}
+
+#qr,#qrPago{margin-top:10px;}
 
 @media print {
 body * { visibility: hidden; }
@@ -166,16 +173,18 @@ class="instagram" target="_blank">📷 Instagram</a>
 
 <script>
 
+// WhatsApp soporte
 function abrirWhatsApp(){
 let mensaje="Hola 👋✨, quiero información sobre los pasadías en Hotel Ventana al Llano 🌿";
 window.open("https://wa.me/573113822023?text="+encodeURIComponent(mensaje));
 }
 
+// barra
 let mensajes=[
-"📞 Atención al cliente (toca aquí)",
+"📞 Atención al cliente:311-382-2023 (toca aquí)",
 "🌿 Bienvenido a Ventana al Llano",
 "🔥 Aprovecha nuestros pasadías",
-"💳 Pagos fáciles",
+"💳 Pagos fáciles, aceptamos nequi, Bancolombia y bre-b",
 "🎟 Reserva aquí"
 ];
 
@@ -190,8 +199,7 @@ function formatear(n){return n.toLocaleString("es-CO");}
 let promoActiva=false;
 
 function verificarHoy(){
-let hoy=new Date();
-if(hoy.getDay()===3){
+if(new Date().getDay()===3){
 promoActiva=true;
 mensajeHoy.innerHTML="<div class='alerta'>🔥 PROMO MIÉRCOLES ACTIVA</div>";
 }
@@ -206,8 +214,11 @@ promoTexto.innerHTML=promoActiva
 : "";
 }
 
+// COMPRA
 function comprar(){
-let n=nombre.value,f=fecha.value,a=+adultos.value,ni=+ninos.value;
+
+let a=parseInt(adultos.value)||0;
+let ni=parseInt(ninos.value)||0;
 
 let pa=promoActiva?20000:25000;
 let pn=promoActiva?10000:15000;
@@ -216,21 +227,50 @@ let total=(a*pa)+(ni*pn);
 
 factura.innerHTML=`
 <div class='factura'>
+
+<h3>Resumen de Reserva</h3>
+
+Adultos: ${a} ($${formatear(pa)})<br>
+Niños: ${ni} ($${formatear(pn)})<br><br>
+
 <strong>Total: $${formatear(total)}</strong><br><br>
+
+<div class='promo'>
+🔒 Pago seguro<br><br>
+
+<strong>Nequi:</strong><br>
+321 277 3549<br>
+Oneida Beltrán<br><br>
+
+<strong>Bancolombia:</strong><br>
+84943216770 - Ahorros<br>
+Oneida Beltrán<br>
+CC: 35285659<br><br>
+
+<strong>Llave BRE:</strong><br>
+86065356
+</div><br>
+
 <input type='file' id='comprobante'><br>
-<button onclick='confirmar(${total})'>Confirmar</button>
+
+<button onclick='confirmar(${total})'>Confirmar Pago</button>
+
 </div>`;
 }
 
+// CONFIRMAR
 function confirmar(total){
 
-if(!comprobante.files.length){alert("Sube comprobante");return;}
+if(!comprobante.files.length){
+alert("⚠️ Debes subir el comprobante de pago antes de continuar");
+return;
+}
 
 let n=nombre.value,f=fecha.value,a=adultos.value,ni=ninos.value;
 
 let tipo = promoActiva ? "PROMO MIÉRCOLES" : "TARIFA NORMAL";
 
-// 🔥 TEXTO DEL QR (SIN CÓDIGO)
+// QR reserva
 let infoQR =
 "Hotel Ventana al Llano\n"+
 "Cliente: "+n+"\n"+
@@ -240,19 +280,71 @@ let infoQR =
 "Total: $"+formatear(total)+"\n"+
 "Tipo: "+tipo;
 
+// QR pago
+let pagoQR =
+"PAGO - Hotel Ventana al Llano\n\n"+
+"Total: $"+formatear(total)+"\n\n"+
+"Nequi: 3212773549\n"+
+"Oneida Beltrán\n\n"+
+"Bancolombia: 84943216770\n"+
+"Ahorros\n"+
+"CC: 35285659\n\n"+
+"Llave BRE: 86065356";
+
 pase.innerHTML=`
 <div class='pase'>
+
 <h3>🎟 PASE OFICIAL</h3>
 ${n}<br>${f}<br><br>
-<div id='qr'></div>
+
+<div class="qr-container">
+
+<div class="qr-box">
+<strong>Reserva</strong>
+<div id="qr"></div>
+</div>
+
+<div class="qr-box">
+<strong>Pago</strong>
+<div id="qrPago"></div>
+</div>
+
+</div>
+
+<br>
+
+<div class="alerta">
+📌 Guarda este pase y envía el comprobante por WhatsApp para validar tu entrada
+</div>
+
+<br>
+
 <button onclick='window.print()'>Descargar</button>
+
 </div>`;
 
+// QRs
 new QRCode(document.getElementById("qr"),{
 text: infoQR,
 width:120,
 height:120
 });
+
+new QRCode(document.getElementById("qrPago"),{
+text: pagoQR,
+width:120,
+height:120
+});
+
+// 🔥 AQUÍ VOLVIÓ LO QUE TE FALTABA
+let mensajeWA = encodeURIComponent(
+"Hola, ya realicé el pago. Adjunto el comprobante en este chat."
+);
+
+setTimeout(() => {
+window.open("https://wa.me/573113822023?text=" + mensajeWA, "_blank");
+}, 1500);
+
 }
 
 </script>
