@@ -168,7 +168,7 @@ font-weight:bold;
 <a href="https://www.instagram.com/ecocabanasventanallano?igsh=aGFxeHppcjM3ZWll&utm_source=qr" 
 class="instagram" target="_blank">📷</a>
 
-<a href="https://wa.me/573113822023" class="whatsapp">💬</a>
+<a href="#" onclick="abrirWhatsApp()" class="whatsapp">💬</a>
 
 <script>
 let mensajes = [
@@ -304,8 +304,26 @@ Niños: ${ninos}<br><br>
 }
 
 function enviarWhatsApp(nombre, adultos, ninos, total){
-let mensaje = `Hola, quiero reservar:%0A
+let mensaje = `Hola, quiero reservar una pasadía 🌿%0A
 Nombre: ${nombre}%0A
+Adultos: ${adultos}%0A
+Niños: ${ninos}%0A
+Total: $${total}`;
+window.open(`https://wa.me/573113822023?text=${mensaje}`);
+}
+
+// BOTON ATENCION AL CLIENTE
+function abrirWhatsApp(){
+let mensajes = [
+"Hola, quiero reservar una pasadía 🌿",
+"Hola, quiero más información sobre las pasadías 😊",
+"Buenas, me gustaría conocer precios y disponibilidad 📅"
+];
+
+let mensaje = mensajes[Math.floor(Math.random() * mensajes.length)];
+
+window.open(`https://wa.me/573113822023?text=${encodeURIComponent(mensaje)}`);
+}%0A
 Adultos: ${adultos}%0A
 Niños: ${ninos}%0A
 Total: $${total}`;
