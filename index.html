@@ -4,10 +4,7 @@
 <meta charset="UTF-8">
 <title>Hotel Ventana al Llano</title>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
 <style>
-
 body{
 font-family:'Segoe UI',sans-serif;
 text-align:center;
@@ -15,7 +12,6 @@ margin:0;
 background:linear-gradient(135deg,#d4fc79,#96e6a1);
 }
 
-/* 🔥 BARRA */
 .soporte{
 background:linear-gradient(90deg,#11998e,#38ef7d);
 color:white;
@@ -25,52 +21,46 @@ top:0;
 width:100%;
 overflow:hidden;
 white-space:nowrap;
-cursor:pointer;
 }
 
 .soporte span{
 display:inline-block;
 padding-left:100%;
-animation:mover 20s linear forwards;
-}
-
-/* overlay CTA */
-#ctaBarra{
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%;
-display:flex;
-align-items:center;
-justify-content:center;
-font-weight:bold;
-opacity:0;
-transition:0.5s;
-pointer-events:none;
+animation:mover 12s linear infinite;
 }
 
 @keyframes mover{
-0%{transform:translateX(100%);}
-70%{transform:translateX(0);}
-100%{transform:translateX(0);}
+0%{transform:translateX(100%); opacity:0;}
+10%{opacity:1;}
+90%{opacity:1;}
+100%{transform:translateX(-100%); opacity:0;}
 }
 
 .container{margin-top:120px;}
-.logo{width:220px;}
+
+.logo{
+width:260px;
+margin-bottom:10px;
+}
+
+.slogan{
+font-style:italic;
+color:#2e7d32;
+margin-bottom:20px;
+}
 
 .card{
-background:rgba(255,255,255,0.9);
+background:rgba(255,255,255,0.95);
 padding:25px;
 border-radius:20px;
 box-shadow:0 10px 30px rgba(0,0,0,0.2);
 display:inline-block;
-width:280px;
+width:300px;
 }
 
 input{
 padding:12px;
-margin:8px;
+margin:8px 0;
 width:90%;
 border-radius:10px;
 border:none;
@@ -85,16 +75,24 @@ color:white;
 border:none;
 border-radius:10px;
 cursor:pointer;
+width:100%;
 }
 
-.factura,.pase{
+.factura{
 margin-top:20px;
 background:white;
 padding:20px;
 border-radius:15px;
 }
 
-/* botones flotantes */
+.galeria img{
+width:90%;
+max-width:300px;
+border-radius:15px;
+margin:10px 0;
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
 .whatsapp{
 position:fixed;
 bottom:20px;
@@ -105,157 +103,130 @@ padding:15px;
 border-radius:50%;
 text-decoration:none;
 }
-
-.instagram{
-position:fixed;
-bottom:80px;
-right:20px;
-background:#E1306C;
-color:white;
-padding:12px 15px;
-border-radius:30px;
-text-decoration:none;
-font-weight:bold;
-}
-
-#qr{margin-top:10px;}
-
 </style>
 </head>
 
-<body onload="verificarHoy()">
+<body>
 
-<!-- 🔥 BARRA -->
-<div class="soporte" onclick="abrirWhatsApp()">
-  <span id="textoSoporte"></span>
-  <div id="ctaBarra">👆 Toca aquí para escribirnos</div>
+<div class="soporte">
+<span id="textoSoporte"></span>
 </div>
 
 <div class="container">
 
-<img src="logo.png" class="logo">
+<!-- LOGO -->
+<img src="logo.jpg" class="logo">
 
-<div id="mensajeHoy"></div>
+<div class="slogan">🌿 Donde la naturaleza se convierte en descanso 🌿</div>
 
 <div class="card">
 <h2>Compra tu Pasadía 🌿</h2>
 
-<input type="text" id="nombre" placeholder="Nombre"><br>
-<input type="date" id="fecha" onchange="verificarPromo()"><br>
+<label><b>Nombre:</b></label>
+<input type="text" id="nombre" placeholder="Escribe tu nombre">
+
+<label><b>Fecha de visita:</b></label>
+<input type="date" id="fecha" onchange="verificarPromo()">
 
 <div id="promoTexto"></div>
 
-<input type="number" id="adultos" placeholder="Adultos" value="0"><br>
-<input type="number" id="ninos" placeholder="Niños" value="0"><br>
+<label><b>¿Cuántos pasadías de ADULTO deseas comprar?</b></label>
+<input type="number" id="adultos" value="0">
 
-<button onclick="comprar()">Calcular</button>
-</div>
+<label><b>¿Cuántos pasadías de NIÑOS deseas comprar?</b></label>
+<input type="number" id="ninos" value="0">
+
+<button onclick="comprar()">Calcular total</button>
 
 <div id="factura"></div>
-<div id="pase"></div>
 
 </div>
 
-<!-- BOTONES -->
+<!-- GALERIA -->
+<div class="galeria">
+<h3>Conoce nuestras instalaciones</h3>
+<img src="foto1.jpg">
+<img src="foto2.jpg">
+<img src="foto3.jpg">
+</div>
+
+</div>
+
 <a href="https://wa.me/573113822023" class="whatsapp">💬</a>
 
-<a href="https://www.instagram.com/ecocabanasventanallano?igsh=aGFxeHppcjM3ZWll&utm_source=qr"
-class="instagram" target="_blank">📷 Instagram</a>
-
 <script>
-
-// abrir WhatsApp
-function abrirWhatsApp(){
-window.open("https://wa.me/573113822023");
-}
-
-// 🔥 MENSAJES PRO
-let mensajes=[
-"📞 Escríbenos por WhatsApp",
-"🌿 Bienvenido a Ventana al Llano",
-"🔥 Promo miércoles disponible",
-"💳 Pagos fáciles",
-"🎟 Reserva aquí"
+let mensajes = [
+"🌿 Bienvenido a Hotel Ventana al Llano",
+"🎟 Reserva tu pasadía aquí",
+"💳 Pagos por Nequi, Bancolombia y Llave",
+"🔥 Promociones todos los miércoles",
+"📞 Escríbenos por WhatsApp"
 ];
 
-let i=0;
-
-function animarMensaje(){
-
-let span=document.getElementById("textoSoporte");
-let cta=document.getElementById("ctaBarra");
-
-span.innerText=mensajes[i];
-
-// reiniciar animación
-span.style.animation="none";
-void span.offsetWidth;
-span.style.animation="mover 20s linear forwards";
-
-// ocultar CTA
-cta.style.opacity=0;
-
-// mostrar CTA al detenerse
-setTimeout(()=>{cta.style.opacity=1;},8000);
-
-// ocultar antes de cambiar
-setTimeout(()=>{cta.style.opacity=0;},10000);
-
-i=(i+1)%mensajes.length;
+let i = 0;
+function cambiarMensaje(){
+document.getElementById("textoSoporte").innerText = mensajes[i];
+i = (i + 1) % mensajes.length;
 }
+setInterval(cambiarMensaje, 4000);
+cambiarMensaje();
 
-setInterval(animarMensaje,10000);
-animarMensaje();
-
-// resto funciones
-function formatear(n){return n.toLocaleString("es-CO");}
-
-let promoActiva=false;
-
-function verificarHoy(){
-if(new Date().getDay()===3){
-mensajeHoy.innerHTML="<div style='background:#ffeb3b;padding:10px;border-radius:10px;'>🔥 PROMO HOY</div>";
-}
-}
+let promoActiva = false;
 
 function verificarPromo(){
-let f=new Date(fecha.value);
-promoActiva=(f.getDay()===3);
-promoTexto.innerHTML=promoActiva?"<div style='background:#e8f5e9;padding:10px;border-radius:10px;'>Promo activa</div>":"";
+let fecha = document.getElementById("fecha").value;
+let f = new Date(fecha);
+
+if(f.getDay() === 3){
+promoActiva = true;
+document.getElementById("promoTexto").innerHTML = `
+<div style="background:#e8f5e9;padding:10px;border-radius:10px;">
+🔥 PROMOCIÓN MIÉRCOLES<br>
+👨 Adultos: $20.000<br>
+👧 Niños: $10.000
+</div>`;
+} else {
+promoActiva = false;
+document.getElementById("promoTexto").innerHTML = "";
+}
 }
 
-function guardarReserva(c,d){
-let r=JSON.parse(localStorage.getItem("reservas"))||{};
-r[c]=d;
-localStorage.setItem("reservas",JSON.stringify(r));
-}
-
-function descargarReserva(data){
-let txt=`RESERVA\nNombre:${data.nombre}\nFecha:${data.fecha}\nTotal:$${formatear(data.total)}\nCodigo:${data.codigo}`;
-let blob=new Blob([txt]);
-let a=document.createElement("a");
-a.href=URL.createObjectURL(blob);
-a.download="reserva_"+data.codigo+".txt";
-a.click();
+function formatear(n){
+return n.toLocaleString("es-CO");
 }
 
 function comprar(){
-let n=nombre.value,f=fecha.value,a=+adultos.value,ni=+ninos.value;
-let pa=promoActiva?20000:25000;
-let pn=promoActiva?10000:15000;
-let total=(a*pa)+(ni*pn);
+let nombre = document.getElementById("nombre").value;
+let adultos = parseInt(document.getElementById("adultos").value);
+let ninos = parseInt(document.getElementById("ninos").value);
 
-factura.innerHTML=`
-<div class='factura'>
-Total:$${formatear(total)}<br>
-<input type='file' id='comprobante'><br>
-<button onclick='confirmar(${total})'>Confirmar</button>
+if(!nombre){alert("Escribe tu nombre");return;}
+
+let precioAdulto = promoActiva ? 20000 : 25000;
+let precioNino = promoActiva ? 10000 : 15000;
+
+let total = (adultos * precioAdulto) + (ninos * precioNino);
+
+document.getElementById("factura").innerHTML = `
+<div class="factura">
+<b>Resumen</b><br><br>
+Nombre: ${nombre}<br>
+Adultos: ${adultos}<br>
+Niños: ${ninos}<br><br>
+<b>Total: $${formatear(total)}</b><br><br>
+<button onclick="enviarWhatsApp('${nombre}',${adultos},${ninos},${total})">Reservar</button>
 </div>`;
 }
 
-function confirmar(total){
+function enviarWhatsApp(nombre, adultos, ninos, total){
+let mensaje = `Hola, quiero reservar:%0A
+Nombre: ${nombre}%0A
+Adultos: ${adultos}%0A
+Niños: ${ninos}%0A
+Total: $${total}`;
+window.open(`https://wa.me/573113822023?text=${mensaje}`);
+}
+</script>
 
-if(!comprobante.files.length){alert("Sube comprobante");return;}
-
-let n=nombre.value,f=fecha.value,a=adultos.value,ni=ninos.value;
-let c=Math
+</body>
+</html>
