@@ -9,15 +9,15 @@
 <style>
 
 body{
-font-family: 'Segoe UI', sans-serif;
+font-family:'Segoe UI',sans-serif;
 text-align:center;
 margin:0;
-background: linear-gradient(135deg, #d4fc79, #96e6a1);
+background:linear-gradient(135deg,#d4fc79,#96e6a1);
 }
 
-/* 🔥 BARRA CLICKEABLE */
+/* 🔥 BARRA */
 .soporte{
-background: linear-gradient(90deg, #11998e, #38ef7d);
+background:linear-gradient(90deg,#11998e,#38ef7d);
 color:white;
 padding:12px;
 position:fixed;
@@ -31,24 +31,36 @@ cursor:pointer;
 .soporte span{
 display:inline-block;
 padding-left:100%;
-animation: mover 20s linear forwards;
+animation:mover 20s linear forwards;
 }
 
-/* movimiento */
+/* overlay CTA */
+#ctaBarra{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+opacity:0;
+transition:0.5s;
+pointer-events:none;
+}
+
 @keyframes mover{
 0%{transform:translateX(100%);}
-70%{transform:translateX(0);}   /* llega */
-100%{transform:translateX(0);}  /* se queda quieto */
+70%{transform:translateX(0);}
+100%{transform:translateX(0);}
 }
 
-.container{
-margin-top:120px;
-}
-
-.logo{ width:220px; }
+.container{margin-top:120px;}
+.logo{width:220px;}
 
 .card{
-background: rgba(255,255,255,0.9);
+background:rgba(255,255,255,0.9);
 padding:25px;
 border-radius:20px;
 box-shadow:0 10px 30px rgba(0,0,0,0.2);
@@ -68,20 +80,21 @@ background:#f1f1f1;
 button{
 padding:12px;
 margin-top:12px;
-background: linear-gradient(90deg, #00c853, #64dd17);
+background:linear-gradient(90deg,#00c853,#64dd17);
 color:white;
 border:none;
 border-radius:10px;
 cursor:pointer;
 }
 
-.factura, .pase{
+.factura,.pase{
 margin-top:20px;
 background:white;
 padding:20px;
 border-radius:15px;
 }
 
+/* botones flotantes */
 .whatsapp{
 position:fixed;
 bottom:20px;
@@ -91,7 +104,6 @@ color:white;
 padding:15px;
 border-radius:50%;
 text-decoration:none;
-font-size:20px;
 }
 
 .instagram{
@@ -103,18 +115,20 @@ color:white;
 padding:12px 15px;
 border-radius:30px;
 text-decoration:none;
-font-size:14px;
 font-weight:bold;
 }
+
+#qr{margin-top:10px;}
 
 </style>
 </head>
 
 <body onload="verificarHoy()">
 
-<!-- 🔥 BARRA CON CLICK -->
+<!-- 🔥 BARRA -->
 <div class="soporte" onclick="abrirWhatsApp()">
-<span id="textoSoporte"></span>
+  <span id="textoSoporte"></span>
+  <div id="ctaBarra">👆 Toca aquí para escribirnos</div>
 </div>
 
 <div class="container">
@@ -150,12 +164,12 @@ class="instagram" target="_blank">📷 Instagram</a>
 
 <script>
 
-// 🔥 abrir WhatsApp directo
+// abrir WhatsApp
 function abrirWhatsApp(){
 window.open("https://wa.me/573113822023");
 }
 
-// 🔥 MENSAJES CON PAUSA
+// 🔥 MENSAJES PRO
 let mensajes=[
 "📞 Escríbenos por WhatsApp",
 "🌿 Bienvenido a Ventana al Llano",
@@ -166,39 +180,48 @@ let mensajes=[
 
 let i=0;
 
-function cambiarMensaje(){
+function animarMensaje(){
+
 let span=document.getElementById("textoSoporte");
+let cta=document.getElementById("ctaBarra");
+
+span.innerText=mensajes[i];
 
 // reiniciar animación
 span.style.animation="none";
 void span.offsetWidth;
 span.style.animation="mover 20s linear forwards";
 
-// cambiar texto
-span.innerText=mensajes[i];
+// ocultar CTA
+cta.style.opacity=0;
+
+// mostrar CTA al detenerse
+setTimeout(()=>{cta.style.opacity=1;},8000);
+
+// ocultar antes de cambiar
+setTimeout(()=>{cta.style.opacity=0;},10000);
+
 i=(i+1)%mensajes.length;
 }
 
-// cada 10 segundos cambia
-setInterval(cambiarMensaje,10000);
-cambiarMensaje();
+setInterval(animarMensaje,10000);
+animarMensaje();
 
-
-// resto funciones (sin cambios)
+// resto funciones
 function formatear(n){return n.toLocaleString("es-CO");}
 
 let promoActiva=false;
 
 function verificarHoy(){
 if(new Date().getDay()===3){
-mensajeHoy.innerHTML="<div class='alerta'>🔥 PROMO HOY</div>";
+mensajeHoy.innerHTML="<div style='background:#ffeb3b;padding:10px;border-radius:10px;'>🔥 PROMO HOY</div>";
 }
 }
 
 function verificarPromo(){
 let f=new Date(fecha.value);
 promoActiva=(f.getDay()===3);
-promoTexto.innerHTML=promoActiva?"<div class='promo'>Promo activa</div>":"";
+promoTexto.innerHTML=promoActiva?"<div style='background:#e8f5e9;padding:10px;border-radius:10px;'>Promo activa</div>":"";
 }
 
 function guardarReserva(c,d){
@@ -235,28 +258,4 @@ function confirmar(total){
 if(!comprobante.files.length){alert("Sube comprobante");return;}
 
 let n=nombre.value,f=fecha.value,a=adultos.value,ni=ninos.value;
-let c=Math.floor(Math.random()*900000+100000);
-
-guardarReserva(c,{nombre:n,fecha:f,adultos:a,ninos:ni,total});
-
-let msg=`Hola 👋%0A%0APago realizado en Hotel Ventana al Llano 🌿%0A%0A👤 ${n}%0A📅 ${f}%0A👥 Adultos: ${a}%0A👶 Niños: ${ni}%0A💰 Total: $${formatear(total)}%0A%0AAdjunto comprobante`;
-
-window.open("https://wa.me/573113822023?text="+msg);
-
-descargarReserva({nombre:n,fecha:f,total,codigo:c});
-
-pase.innerHTML=`
-<div class='pase'>
-<h3>🎟 PASE VIP</h3>
-${n}<br>${f}<br>${c}
-<div id='qr'></div>
-<button onclick='window.print()'>Descargar</button>
-</div>`;
-
-new QRCode(document.getElementById("qr"),{text:c.toString(),width:120,height:120});
-}
-
-</script>
-
-</body>
-</html>
+let c=Math
