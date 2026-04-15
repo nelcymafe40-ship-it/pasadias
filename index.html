@@ -143,10 +143,10 @@ font-weight:bold;
 <div id="promoTexto"></div>
 
 <label><b>¿Cuántos pasadías de ADULTO deseas comprar?</b></label>
-<input type="number" id="adultos" value="0">
+<input type="number" id="adultos" value="0" min="0" oninput="this.value = Math.abs(this.value)">
 
 <label><b>¿Cuántos pasadías de NIÑOS deseas comprar?</b></label>
-<input type="number" id="ninos" value="0">
+<input type="number" id="ninos" value="0" min="0" oninput="this.value = Math.abs(this.value)">
 
 <button onclick="comprar()">Calcular total</button>
 
