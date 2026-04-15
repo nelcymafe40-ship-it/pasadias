@@ -39,10 +39,7 @@ animation:mover 20s linear infinite;
 
 .container{margin-top:120px;}
 
-.logo{
-width:220px;
-margin-top:10px;
-}
+.logo{width:220px;margin-top:10px;}
 
 .card{
 background:rgba(255,255,255,0.95);
@@ -166,11 +163,13 @@ class="instagram" target="_blank">📷 Instagram</a>
 
 <script>
 
+// WhatsApp
 function abrirWhatsApp(){
 let mensaje="Hola 👋✨, quiero información sobre los pasadías en Hotel Ventana al Llano 🌿";
 window.open("https://wa.me/573113822023?text="+encodeURIComponent(mensaje));
 }
 
+// barra
 let mensajes=[
 "📞 Atención al cliente (toca aquí)",
 "🌿 Bienvenido a Ventana al Llano",
@@ -190,8 +189,7 @@ function formatear(n){return n.toLocaleString("es-CO");}
 let promoActiva=false;
 
 function verificarHoy(){
-let hoy=new Date();
-if(hoy.getDay()===3){
+if(new Date().getDay()===3){
 promoActiva=true;
 mensajeHoy.innerHTML="<div class='alerta'>🔥 PROMO MIÉRCOLES ACTIVA</div>";
 }
@@ -206,8 +204,9 @@ promoTexto.innerHTML=promoActiva
 : "";
 }
 
+// COMPRA
 function comprar(){
-let n=nombre.value,f=fecha.value,a=+adultos.value,ni=+ninos.value;
+let a=+adultos.value,ni=+ninos.value;
 
 let pa=promoActiva?20000:25000;
 let pn=promoActiva?10000:15000;
@@ -216,12 +215,33 @@ let total=(a*pa)+(ni*pn);
 
 factura.innerHTML=`
 <div class='factura'>
+
+<h3>Resumen</h3>
 <strong>Total: $${formatear(total)}</strong><br><br>
+
+<div class='promo'>
+🔒 Pago seguro<br><br>
+
+<strong>Nequi:</strong><br>
+321 277 3549<br>
+Oneida Beltrán<br><br>
+
+<strong>Bancolombia:</strong><br>
+84943216770 - Ahorros<br>
+Oneida Beltrán<br>
+CC: 35285659<br><br>
+
+<strong>Llave BRE:</strong><br>
+86065356
+</div><br>
+
 <input type='file' id='comprobante'><br>
-<button onclick='confirmar(${total})'>Confirmar</button>
+<button onclick='confirmar(${total})'>Confirmar Pago</button>
+
 </div>`;
 }
 
+// CONFIRMAR
 function confirmar(total){
 
 if(!comprobante.files.length){alert("Sube comprobante");return;}
@@ -230,7 +250,7 @@ let n=nombre.value,f=fecha.value,a=adultos.value,ni=ninos.value;
 
 let tipo = promoActiva ? "PROMO MIÉRCOLES" : "TARIFA NORMAL";
 
-// 🔥 TEXTO DEL QR (SIN CÓDIGO)
+// 🔥 QR CON TODA LA INFO
 let infoQR =
 "Hotel Ventana al Llano\n"+
 "Cliente: "+n+"\n"+
