@@ -213,13 +213,38 @@ return n.toLocaleString("es-CO");
 
 function comprar(){
 let nombre = document.getElementById("nombre").value;
-let adultos = Math.max(0, parseInt(document.getElementById("adultos").value) || 0);
-let ninos = Math.max(0, parseInt(document.getElementById("ninos").value) || 0);
 
-// VALIDACIONES
+let adultos = parseInt(document.getElementById("adultos").value);
+let ninos = parseInt(document.getElementById("ninos").value);
+
+// corregir valores inválidos
+adultos = isNaN(adultos) || adultos < 0 ? 0 : adultos;
+ninos = isNaN(ninos) || ninos < 0 ? 0 : ninos;
+
 if(!nombre){
 alert("Escribe tu nombre");
 return;
+}
+
+if(adultos === 0 && ninos === 0){
+alert("Debes seleccionar al menos 1 pasadía");
+return;
+}
+
+let precioAdulto = promoActiva ? 20000 : 25000;
+let precioNino = promoActiva ? 10000 : 15000;
+
+let total = (adultos * precioAdulto) + (ninos * precioNino);
+
+document.getElementById("factura").innerHTML = `
+<div class="factura">
+<b>Resumen</b><br><br>
+Nombre: ${nombre}<br>
+Adultos: ${adultos}<br>
+Niños: ${ninos}<br><br>
+<b>Total: $${formatear(total)}</b><br><br>
+<button onclick="enviarWhatsApp('${nombre}',${adultos},${ninos},${total})">Reservar</button>
+</div>`;
 }
 
 if(adultos < 0 || ninos < 0){
