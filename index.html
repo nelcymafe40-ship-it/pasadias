@@ -15,7 +15,7 @@ margin:0;
 background:linear-gradient(135deg,#d4fc79,#96e6a1);
 }
 
-/* BARRA SUPERIOR */
+/* BARRA */
 .soporte{
 background:linear-gradient(90deg,#11998e,#38ef7d);
 color:white;
@@ -41,7 +41,11 @@ animation:mover 20s linear infinite;
 
 .container{margin-top:120px;}
 
-.logo{width:220px;}
+/* LOGO */
+.logo{
+width:220px;
+margin-top:10px;
+}
 
 /* CARD */
 .card{
@@ -79,7 +83,6 @@ padding:20px;
 border-radius:15px;
 }
 
-/* ALERTAS */
 .alerta{
 background:#ffeb3b;
 padding:10px;
@@ -92,7 +95,6 @@ background:#e8f5e9;
 padding:10px;
 border-radius:10px;
 margin-top:10px;
-color:#1b5e20;
 font-weight:bold;
 }
 
@@ -140,7 +142,9 @@ body * { visibility: hidden; }
 
 <div class="container">
 
-<img src="logo.png" class="logo">
+<!-- 🔥 LOGO CON RESPALDO -->
+<img src="logo.png" class="logo"
+onerror="this.src='https://cdn-icons-png.flaticon.com/512/139/139899.png'">
 
 <div id="mensajeHoy"></div>
 
@@ -171,14 +175,19 @@ class="instagram" target="_blank">📷 Instagram</a>
 
 <script>
 
-// WhatsApp directo
+// 🔥 WHATSAPP CON MENSAJE AUTOMÁTICO
 function abrirWhatsApp(){
-window.open("https://wa.me/573113822023");
+
+let mensaje="Hola 👋✨, quiero información sobre los pasadías en Hotel Ventana al Llano 🌿";
+
+let url="https://wa.me/573113822023?text="+encodeURIComponent(mensaje);
+
+window.open(url);
 }
 
 // mensajes barra
 let mensajes=[
-"📞 Escríbenos por WhatsApp",
+"📞 Atención al cliente (toca aquí)",
 "🌿 Bienvenido a Ventana al Llano",
 "🔥 Aprovecha nuestros pasadías",
 "💳 Pagos fáciles",
@@ -191,12 +200,12 @@ textoSoporte.innerText=mensajes[i];
 i=(i+1)%mensajes.length;
 },5000);
 
-// formato dinero
+// formato
 function formatear(n){return n.toLocaleString("es-CO");}
 
 let promoActiva=false;
 
-// 🔥 PROMO AUTOMÁTICA POR DÍA ACTUAL
+// promo hoy
 function verificarHoy(){
 let hoy=new Date();
 
@@ -206,7 +215,7 @@ mensajeHoy.innerHTML="<div class='alerta'>🔥 HOY ES MIÉRCOLES: PROMO ACTIVA</
 }
 }
 
-// 🔥 PROMO POR FECHA ELEGIDA
+// promo por fecha
 function verificarPromo(){
 let f=new Date(fecha.value);
 promoActiva=(f.getDay()===3);
@@ -223,7 +232,7 @@ r[c]=d;
 localStorage.setItem("reservas",JSON.stringify(r));
 }
 
-// descarga
+// descargar
 function descargarReserva(data){
 let txt=`RESERVA\nNombre:${data.nombre}\nFecha:${data.fecha}\nTotal:$${formatear(data.total)}\nCodigo:${data.codigo}`;
 let blob=new Blob([txt]);
@@ -267,15 +276,12 @@ let c=Math.floor(Math.random()*900000+100000);
 
 guardarReserva(c,{nombre:n,fecha:f,adultos:a,ninos:ni,total});
 
-// mensaje WhatsApp
 let msg=`Hola 👋%0A%0AHe realizado el pago en *Hotel Ventana al Llano* 🌿%0A%0A👤 ${n}%0A📅 ${f}%0A👥 Adultos: ${a}%0A👶 Niños: ${ni}%0A💰 Total: $${formatear(total)}%0A%0AAdjunto comprobante 🙌`;
 
 window.open("https://wa.me/573113822023?text="+msg);
 
-// descarga
 descargarReserva({nombre:n,fecha:f,total,codigo:c});
 
-// pase
 pase.innerHTML=`
 <div class='pase'>
 <h3>🎟 PASE OFICIAL</h3>
