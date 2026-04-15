@@ -123,6 +123,28 @@ font-weight:bold;
 
 #qr{margin-top:10px;}
 
+/* ⭐ TOAST */
+.toast{
+position:fixed;
+top:20px;
+left:50%;
+transform:translateX(-50%);
+background:#222;
+color:white;
+padding:14px 20px;
+border-radius:12px;
+box-shadow:0 10px 25px rgba(0,0,0,0.3);
+font-weight:bold;
+z-index:9999;
+opacity:0;
+transition:0.4s;
+}
+
+.toast.show{
+opacity:1;
+transform:translateX(-50%) translateY(10px);
+}
+
 @media print {
 body * { visibility: hidden; }
 .pase, .pase * { visibility: visible; }
@@ -149,12 +171,20 @@ onerror="this.src='https://cdn-icons-png.flaticon.com/512/139/139899.png'">
 <h2>Compra tu Pasadía 🌿</h2>
 
 <input type="text" id="nombre" placeholder="Nombre"><br>
-<input type="date" id="fecha" onchange="verificarPromo()"><br>
+
+<input type="number" id="adultos"
+placeholder="cuantas pasadias adultos desea comprar?"
+value="0" min="0"
+oninput="if(this.value<0)this.value=0"><br>
+
+<input type="number" id="ninos"
+placeholder="cuantas pasadias niños desea comprar? *"
+value="0" min="0"
+oninput="if(this.value<0)this.value=0"><br>
+
+<input type="date" id="fecha" onchange="verificarPromo"><br>
 
 <div id="promoTexto"></div>
-
-<input type="number" id="adultos" placeholder="Adultos" value="0"><br>
-<input type="number" id="ninos" placeholder="Niños" value="0"><br>
 
 <button onclick="comprar()">Calcular</button>
 </div>
@@ -163,6 +193,9 @@ onerror="this.src='https://cdn-icons-png.flaticon.com/512/139/139899.png'">
 <div id="pase"></div>
 
 </div>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
 
 <a href="https://wa.me/573113822023" class="whatsapp">💬</a>
 
@@ -175,6 +208,16 @@ function abrirWhatsApp(){
 let mensaje="Hola 👋✨, quiero información sobre los pasadías en Hotel Ventana al Llano 🌿";
 let url="https://wa.me/573113822023?text="+encodeURIComponent(mensaje);
 window.open(url);
+}
+
+function mostrarAlerta(msg){
+let t=document.getElementById("toast");
+t.innerText=msg;
+t.classList.add("show");
+
+setTimeout(()=>{
+t.classList.remove("show");
+},3000);
 }
 
 let mensajes=[
@@ -250,7 +293,7 @@ Niño: $${formatear(pn)}<br><br>
 function confirmar(total){
 
 if(!comprobante.files.length){
-alert("Sube el comprobante");
+mostrarAlerta("⚠️ Sube el comprobante");
 return;
 }
 
@@ -266,7 +309,7 @@ window.open("https://wa.me/573113822023?text="+msg);
 // descarga
 descargarReserva({nombre:n,fecha:f,total,codigo:c});
 
-// 🔥 PASE DINÁMICO
+// pase
 let pa=promoActiva?20000:25000;
 let pn=promoActiva?10000:15000;
 
