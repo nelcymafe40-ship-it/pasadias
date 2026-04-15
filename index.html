@@ -15,19 +15,16 @@ margin:0;
 background: linear-gradient(135deg, #d4fc79, #96e6a1);
 }
 
-/* 🔥 BARRA DINÁMICA */
+/* BARRA */
 .soporte{
 background: linear-gradient(90deg, #11998e, #38ef7d);
 color:white;
 padding:12px;
-font-weight:bold;
 position:fixed;
 top:0;
 width:100%;
 overflow:hidden;
 white-space:nowrap;
-font-size:14px;
-z-index:1000;
 }
 
 .soporte span{
@@ -37,50 +34,37 @@ animation: mover 12s linear infinite;
 }
 
 @keyframes mover{
-0% { transform: translateX(0); }
-100% { transform: translateX(-100%); }
+0%{transform:translateX(0);}
+100%{transform:translateX(-100%);}
 }
 
-/* CONTENEDOR */
 .container{
 margin-top:120px;
 }
 
-/* LOGO */
 .logo{
 width:220px;
-margin-bottom:15px;
 }
 
-/* TARJETA */
+/* CARD */
 .card{
 background: rgba(255,255,255,0.9);
-backdrop-filter: blur(10px);
 padding:25px;
 border-radius:20px;
 box-shadow:0 10px 30px rgba(0,0,0,0.2);
 display:inline-block;
 width:280px;
-transition:0.3s;
 }
 
-.card:hover{
-transform: translateY(-5px);
-}
-
-/* INPUTS */
 input{
 padding:12px;
 margin:8px;
 width:90%;
 border-radius:10px;
 border:none;
-outline:none;
 background:#f1f1f1;
-font-size:14px;
 }
 
-/* BOTÓN */
 button{
 padding:12px;
 margin-top:12px;
@@ -89,39 +73,14 @@ color:white;
 border:none;
 border-radius:10px;
 cursor:pointer;
-font-weight:bold;
-transition:0.3s;
 }
 
-button:hover{
-transform: scale(1.05);
-}
-
-/* FACTURA */
-.factura{
+/* FACTURA Y PASE */
+.factura, .pase{
 margin-top:20px;
 background:white;
 padding:20px;
 border-radius:15px;
-box-shadow:0 5px 15px rgba(0,0,0,0.15);
-animation: aparecer 0.5s ease;
-}
-
-/* PASE */
-.pase{
-background:white;
-border-radius:15px;
-padding:25px;
-margin-top:20px;
-display:inline-block;
-width:320px;
-box-shadow:0 5px 20px rgba(0,0,0,0.2);
-animation: aparecer 0.5s ease;
-}
-
-@keyframes aparecer{
-from{opacity:0; transform:translateY(20px);}
-to{opacity:1; transform:translateY(0);}
 }
 
 /* ALERTA */
@@ -129,7 +88,6 @@ to{opacity:1; transform:translateY(0);}
 background:#ffeb3b;
 padding:10px;
 border-radius:10px;
-margin-bottom:10px;
 font-weight:bold;
 }
 
@@ -139,11 +97,9 @@ background:#e8f5e9;
 padding:12px;
 border-radius:10px;
 margin-top:10px;
-color:#1b5e20;
-font-weight:bold;
 }
 
-/* BOTÓN WHATSAPP */
+/* BOTONES FLOTANTES */
 .whatsapp{
 position:fixed;
 bottom:20px;
@@ -152,14 +108,23 @@ background:#25D366;
 color:white;
 padding:15px;
 border-radius:50%;
-font-size:20px;
-box-shadow:0 5px 10px rgba(0,0,0,0.3);
 text-decoration:none;
+font-size:20px;
 }
 
-#qr{
-margin-top:10px;
+.instagram{
+position:fixed;
+bottom:80px;
+right:20px;
+background:#E1306C;
+color:white;
+padding:15px;
+border-radius:50%;
+text-decoration:none;
+font-size:20px;
 }
+
+#qr{margin-top:10px;}
 
 @media print {
 body * { visibility: hidden; }
@@ -172,7 +137,6 @@ body * { visibility: hidden; }
 
 <body onload="verificarHoy()">
 
-<!-- 🔥 BARRA -->
 <div class="soporte">
 <span id="textoSoporte"></span>
 </div>
@@ -184,25 +148,17 @@ body * { visibility: hidden; }
 <div id="mensajeHoy"></div>
 
 <div class="card">
-
 <h2>Compra tu Pasadía 🌿</h2>
 
-Nombre:<br>
-<input type="text" id="nombre"><br>
-
-Fecha:<br>
+<input type="text" id="nombre" placeholder="Nombre"><br>
 <input type="date" id="fecha" onchange="verificarPromo()"><br>
 
 <div id="promoTexto"></div>
 
-Adultos:<br>
-<input type="number" id="adultos" value="0"><br>
-
-Niños:<br>
-<input type="number" id="ninos" value="0"><br>
+<input type="number" id="adultos" placeholder="Adultos" value="0"><br>
+<input type="number" id="ninos" placeholder="Niños" value="0"><br>
 
 <button onclick="comprar()">Calcular</button>
-
 </div>
 
 <div id="factura"></div>
@@ -210,130 +166,138 @@ Niños:<br>
 
 </div>
 
-<!-- BOTÓN WHATSAPP -->
+<!-- BOTONES -->
 <a href="https://wa.me/573113822023" class="whatsapp">💬</a>
+
+<a href="https://www.instagram.com/ecocabanasventanallano?igsh=aGFxeHppcjM3ZWll&utm_source=qr" 
+class="instagram" target="_blank">📷</a>
+
+<!-- ADMIN -->
+<button onclick="abrirAdmin()" style="position:fixed;bottom:20px;left:20px;">Admin</button>
+
+<div id="panelAdmin" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:white;overflow:auto;padding:20px;">
+<h2>Reservas</h2>
+<div id="listaReservas"></div>
+<button onclick="cerrarAdmin()">Cerrar</button>
+</div>
 
 <script>
 
-// 🔥 MENSAJES
-let mensajes = [
-"📞 Atención 24/7: 311 382 2023",
-"🌿 Bienvenido a Hotel Ventana al Llano",
-"🔥 Promo Miércoles: Adultos $20.000 | Niños $10.000",
-"💳 Aceptamos Nequi, Bancolombia y BRE",
-"🎟 Reserva fácil y rápida aquí",
-"📲 Envía tu comprobante por WhatsApp"
+let mensajes=[
+"📞 Atención 311 382 2023",
+"🌿 Bienvenido",
+"🔥 Promo miércoles",
+"💳 Pagos fáciles",
+"🎟 Reserva aquí"
 ];
 
-let index = 0;
+let i=0;
+setInterval(()=>{
+document.getElementById("textoSoporte").innerText=mensajes[i];
+i=(i+1)%mensajes.length;
+},4000);
 
-function cambiarMensaje(){
-document.getElementById("textoSoporte").innerText = mensajes[index];
-index = (index + 1) % mensajes.length;
-}
+// FORMATO
+function formatear(n){return n.toLocaleString("es-CO");}
 
-setInterval(cambiarMensaje, 4000);
-cambiarMensaje();
-
-function formatear(numero){
-return numero.toLocaleString("es-CO");
-}
-
-let promoActiva = false;
+let promoActiva=false;
 
 function verificarHoy(){
-let hoy = new Date();
-if(hoy.getDay() === 3){
-document.getElementById("mensajeHoy").innerHTML =
-"<div class='alerta'>🔥 HOY ES MIÉRCOLES DE PROMO 🔥</div>";
+if(new Date().getDay()===3){
+document.getElementById("mensajeHoy").innerHTML="<div class='alerta'>🔥 PROMO HOY</div>";
 }
 }
 
 function verificarPromo(){
-let fecha = new Date(document.getElementById("fecha").value);
-promoActiva = (fecha.getDay() === 3);
-
-document.getElementById("promoTexto").innerHTML = promoActiva
-? "<div class='promo'>Promo: Adultos $20.000 | Niños $10.000</div>"
-: "";
+let f=new Date(fecha.value);
+promoActiva=(f.getDay()===3);
+promoTexto.innerHTML=promoActiva?"<div class='promo'>Promo activa</div>":"";
 }
 
-function guardarReserva(codigo, data){
-let reservas = JSON.parse(localStorage.getItem("reservas")) || {};
-reservas[codigo] = data;
-localStorage.setItem("reservas", JSON.stringify(reservas));
+function guardarReserva(c,d){
+let r=JSON.parse(localStorage.getItem("reservas"))||{};
+r[c]=d;
+localStorage.setItem("reservas",JSON.stringify(r));
 }
 
+// DESCARGA
+function descargarReserva(data){
+let txt=`RESERVA\nNombre:${data.nombre}\nFecha:${data.fecha}\nAdultos:${data.adultos}\nNiños:${data.ninos}\nTotal:$${formatear(data.total)}\nCodigo:${data.codigo}`;
+let blob=new Blob([txt]);
+let a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="reserva_"+data.codigo+".txt";
+a.click();
+}
+
+// COMPRA
 function comprar(){
+let n=nombre.value,f=fecha.value,a=+adultos.value,ni=+ninos.value;
+let pa=promoActiva?20000:25000;
+let pn=promoActiva?10000:15000;
+let total=(a*pa)+(ni*pn);
 
-let nombre=document.getElementById("nombre").value;
-let fecha=document.getElementById("fecha").value;
-let adultos=parseInt(document.getElementById("adultos").value);
-let ninos=parseInt(document.getElementById("ninos").value);
-
-let hoy = new Date();
-let fechaSel = new Date(fecha);
-
-if(fechaSel < hoy){
-alert("No puedes elegir fechas pasadas");
-return;
+factura.innerHTML=`
+<div class='factura'>
+Total:$${formatear(total)}<br>
+<input type='file' id='comprobante'><br>
+<button onclick='confirmar(${total})'>Confirmar</button>
+</div>`;
 }
 
-let precioAdulto = promoActiva ? 20000 : 25000;
-let precioNino = promoActiva ? 10000 : 15000;
-
-let total=(adultos*precioAdulto)+(ninos*precioNino);
-
-document.getElementById("factura").innerHTML=
-"<div class='factura'>"+
-"<h3>Resumen de Reserva</h3>"+
-"Cliente: "+nombre+"<br>"+
-"Fecha: "+fecha+"<br>"+
-"<strong>Total: $"+formatear(total)+"</strong><br><br>"+
-
-"<div class='promo'>"+
-"🔒 Pago seguro<br><br>"+
-"Nequi: 3212773549<br>"+
-"Bancolombia: 84943216770<br>"+
-"Oneida Beltran<br><br>"+
-"BRE: 86065356"+
-"</div><br>"+
-
-"<input type='file' id='comprobante'><br>"+
-"<button onclick='confirmar("+total+")'>Confirmar Pago</button>"+
-"</div>";
-}
-
+// CONFIRMAR
 function confirmar(total){
 
-if(document.getElementById("comprobante").files.length==0){
-alert("Sube el comprobante");
-return;
+if(!comprobante.files.length){alert("Sube comprobante");return;}
+
+let n=nombre.value,f=fecha.value,a=adultos.value,ni=ninos.value;
+let c=Math.floor(Math.random()*900000+100000);
+
+guardarReserva(c,{nombre:n,fecha:f,adultos:a,ninos:ni,total});
+
+// WhatsApp
+let msg=`Hola 👋%0A%0APago realizado en Hotel Ventana al Llano 🌿%0A%0A👤 ${n}%0A📅 ${f}%0A👥 Adultos: ${a}%0A👶 Niños: ${ni}%0A💰 Total: $${formatear(total)}%0A%0AAdjunto comprobante`;
+window.open("https://wa.me/573113822023?text="+msg);
+
+// descarga
+descargarReserva({nombre:n,fecha:f,adultos:a,ninos:ni,total,codigo:c});
+
+// pase
+pase.innerHTML=`
+<div class='pase'>
+<h3>🎟 PASE VIP</h3>
+${n}<br>${f}<br>${c}
+<div id='qr'></div>
+<button onclick='window.print()'>Descargar</button>
+</div>`;
+
+new QRCode(document.getElementById("qr"),{text:c.toString(),width:120,height:120});
 }
 
-let nombre=document.getElementById("nombre").value;
-let fecha=document.getElementById("fecha").value;
-let codigo=Math.floor(Math.random()*900000+100000);
+// ADMIN
+function abrirAdmin(){
+if(prompt("Clave")!=="1234")return;
+panelAdmin.style.display="block";
+cargar();
+}
 
-guardarReserva(codigo,{nombre,fecha,total});
+function cerrarAdmin(){panelAdmin.style.display="none";}
 
-window.open("https://wa.me/573113822023");
+function cargar(){
+let r=JSON.parse(localStorage.getItem("reservas"))||{};
+let html="";
+for(let c in r){
+let x=r[c];
+html+=`<div>${c} - ${x.nombre} - $${formatear(x.total)} <button onclick="del('${c}')">X</button></div>`;
+}
+listaReservas.innerHTML=html||"Sin datos";
+}
 
-document.getElementById("pase").innerHTML=
-"<div class='pase'>"+
-"<h3>🎟 PASE VIP</h3>"+
-"Cliente: "+nombre+"<br>"+
-"Fecha: "+fecha+"<br>"+
-"Código: "+codigo+"<br>"+
-"<div id='qr'></div><br>"+
-"<button onclick='window.print()'>Descargar</button>"+
-"</div>";
-
-new QRCode(document.getElementById("qr"), {
-text: codigo.toString(),
-width: 120,
-height: 120
-});
+function del(c){
+let r=JSON.parse(localStorage.getItem("reservas"))||{};
+delete r[c];
+localStorage.setItem("reservas",JSON.stringify(r));
+cargar();
 }
 
 </script>
