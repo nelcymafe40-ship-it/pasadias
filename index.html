@@ -7,121 +7,134 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
+
 body{
-font-family: Arial;
+font-family:'Segoe UI',sans-serif;
 text-align:center;
-background:#f0f4f3;
 margin:0;
+background:linear-gradient(135deg,#d4fc79,#96e6a1);
 }
 
-/* 🔥 BARRA DINÁMICA */
+/* BARRA SUPERIOR */
 .soporte{
-background: linear-gradient(90deg, #25D366, #1ebea5);
+background:linear-gradient(90deg,#11998e,#38ef7d);
 color:white;
 padding:12px;
-font-weight:bold;
 position:fixed;
 top:0;
 width:100%;
 overflow:hidden;
 white-space:nowrap;
+cursor:pointer;
 }
 
 .soporte span{
 display:inline-block;
 padding-left:100%;
-animation: mover 20s linear infinite;
+animation:mover 20s linear infinite;
 }
 
 @keyframes mover{
-0% { transform: translateX(0); }
-100% { transform: translateX(-100%); }
+0%{transform:translateX(0);}
+100%{transform:translateX(-100%);}
 }
 
-.container{
-margin-top:100px;
-}
+.container{margin-top:120px;}
 
-.logo{
-width:280px;
-margin:10px;
-}
+.logo{width:220px;}
 
+/* CARD */
 .card{
-background:white;
-padding:20px;
-border-radius:15px;
-box-shadow:0px 5px 15px rgba(0,0,0,0.2);
+background:rgba(255,255,255,0.95);
+padding:25px;
+border-radius:20px;
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
 display:inline-block;
+width:280px;
 }
 
 input{
-padding:10px;
+padding:12px;
 margin:8px;
-width:200px;
-border-radius:8px;
-border:1px solid #ccc;
+width:90%;
+border-radius:10px;
+border:none;
+background:#f1f1f1;
 }
 
 button{
 padding:12px;
-margin-top:10px;
-background:#2e7d32;
+margin-top:12px;
+background:linear-gradient(90deg,#00c853,#64dd17);
 color:white;
 border:none;
-border-radius:8px;
+border-radius:10px;
 cursor:pointer;
 }
 
-.factura{
+.factura,.pase{
 margin-top:20px;
 background:white;
 padding:20px;
-border-radius:10px;
+border-radius:15px;
 }
 
-.pase{
-background:white;
-border:3px dashed black;
-padding:25px;
-margin-top:20px;
-display:inline-block;
-width:320px;
-}
-
+/* ALERTAS */
 .alerta{
 background:#ffeb3b;
 padding:10px;
 border-radius:10px;
-margin-bottom:10px;
 font-weight:bold;
 }
 
 .promo{
 background:#e8f5e9;
-padding:12px;
+padding:10px;
 border-radius:10px;
 margin-top:10px;
 color:#1b5e20;
 font-weight:bold;
 }
 
-#qr{
-margin-top:10px;
+/* BOTONES */
+.whatsapp{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#25D366;
+color:white;
+padding:15px;
+border-radius:50%;
+text-decoration:none;
 }
+
+.instagram{
+position:fixed;
+bottom:80px;
+right:20px;
+background:#E1306C;
+color:white;
+padding:12px 15px;
+border-radius:30px;
+text-decoration:none;
+font-weight:bold;
+}
+
+#qr{margin-top:10px;}
 
 @media print {
 body * { visibility: hidden; }
 .pase, .pase * { visibility: visible; }
 .pase { position:absolute; top:0; left:0; width:100%; }
 }
+
 </style>
 </head>
 
 <body onload="verificarHoy()">
 
-<!-- 🔥 BARRA ANIMADA -->
-<div class="soporte">
+<!-- BARRA -->
+<div class="soporte" onclick="abrirWhatsApp()">
 <span id="textoSoporte"></span>
 </div>
 
@@ -132,25 +145,17 @@ body * { visibility: hidden; }
 <div id="mensajeHoy"></div>
 
 <div class="card">
-
 <h2>Compra tu Pasadía 🌿</h2>
 
-Nombre:<br>
-<input type="text" id="nombre"><br>
-
-Fecha:<br>
+<input type="text" id="nombre" placeholder="Nombre"><br>
 <input type="date" id="fecha" onchange="verificarPromo()"><br>
 
 <div id="promoTexto"></div>
 
-Adultos:<br>
-<input type="number" id="adultos" value="0"><br>
-
-Niños:<br>
-<input type="number" id="ninos" value="0"><br>
+<input type="number" id="adultos" placeholder="Adultos" value="0"><br>
+<input type="number" id="ninos" placeholder="Niños" value="0"><br>
 
 <button onclick="comprar()">Calcular</button>
-
 </div>
 
 <div id="factura"></div>
@@ -158,157 +163,131 @@ Niños:<br>
 
 </div>
 
+<!-- BOTONES -->
+<a href="https://wa.me/573113822023" class="whatsapp">💬</a>
+
+<a href="https://www.instagram.com/ecocabanasventanallano?igsh=aGFxeHppcjM3ZWll&utm_source=qr"
+class="instagram" target="_blank">📷 Instagram</a>
+
 <script>
 
-// 🔥 MENSAJES DINÁMICOS
-let mensajes = [
-"📞 Atención 24/7: 311 382 2023",
-"🌿 Bienvenido a Hotel Ventana al Llano",
-"🔥 Promo Miércoles: Adultos $20.000 | Niños $10.000",
-"💳 Aceptamos Nequi, Bancolombia y BRE",
-"🎟 Compra tu pasadía fácil y rápido aquí",
-"📲 Envía tu comprobante por WhatsApp"
+// WhatsApp directo
+function abrirWhatsApp(){
+window.open("https://wa.me/573113822023");
+}
+
+// mensajes barra
+let mensajes=[
+"📞 Escríbenos por WhatsApp",
+"🌿 Bienvenido a Ventana al Llano",
+"🔥 Aprovecha nuestros pasadías",
+"💳 Pagos fáciles",
+"🎟 Reserva aquí"
 ];
 
-let index = 0;
+let i=0;
+setInterval(()=>{
+textoSoporte.innerText=mensajes[i];
+i=(i+1)%mensajes.length;
+},5000);
 
-function cambiarMensaje(){
-document.getElementById("textoSoporte").innerText = mensajes[index];
-index = (index + 1) % mensajes.length;
-}
+// formato dinero
+function formatear(n){return n.toLocaleString("es-CO");}
 
-setInterval(cambiarMensaje, 4000);
-cambiarMensaje();
+let promoActiva=false;
 
-
-// formato colombiano
-function formatear(numero){
-return numero.toLocaleString("es-CO");
-}
-
-let promoActiva = false;
-
+// 🔥 PROMO AUTOMÁTICA POR DÍA ACTUAL
 function verificarHoy(){
-let hoy = new Date();
-if(hoy.getDay() === 3){
-document.getElementById("mensajeHoy").innerHTML =
-"<div class='alerta'>🔥 HOY ES MIÉRCOLES DE PROMO 🔥</div>";
+let hoy=new Date();
+
+if(hoy.getDay()===3){
+promoActiva=true;
+mensajeHoy.innerHTML="<div class='alerta'>🔥 HOY ES MIÉRCOLES: PROMO ACTIVA</div>";
 }
 }
 
+// 🔥 PROMO POR FECHA ELEGIDA
 function verificarPromo(){
-let fecha = new Date(document.getElementById("fecha").value);
-promoActiva = (fecha.getDay() === 3);
+let f=new Date(fecha.value);
+promoActiva=(f.getDay()===3);
 
-document.getElementById("promoTexto").innerHTML = promoActiva
-? "<div class='promo'>Promo: Adultos $20.000 | Niños $10.000</div>"
+promoTexto.innerHTML=promoActiva
+? "<div class='promo'>Adultos $20.000 | Niños $10.000</div>"
 : "";
 }
 
-function guardarReserva(codigo, data){
-let reservas = JSON.parse(localStorage.getItem("reservas")) || {};
-reservas[codigo] = data;
-localStorage.setItem("reservas", JSON.stringify(reservas));
+// guardar
+function guardarReserva(c,d){
+let r=JSON.parse(localStorage.getItem("reservas"))||{};
+r[c]=d;
+localStorage.setItem("reservas",JSON.stringify(r));
 }
 
+// descarga
+function descargarReserva(data){
+let txt=`RESERVA\nNombre:${data.nombre}\nFecha:${data.fecha}\nTotal:$${formatear(data.total)}\nCodigo:${data.codigo}`;
+let blob=new Blob([txt]);
+let a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="reserva_"+data.codigo+".txt";
+a.click();
+}
+
+// calcular
 function comprar(){
+let n=nombre.value,f=fecha.value,a=+adultos.value,ni=+ninos.value;
 
-let nombre=document.getElementById("nombre").value;
-let fecha=document.getElementById("fecha").value;
-let adultos=parseInt(document.getElementById("adultos").value);
-let ninos=parseInt(document.getElementById("ninos").value);
+let pa=promoActiva?20000:25000;
+let pn=promoActiva?10000:15000;
 
-let hoy = new Date();
-let fechaSel = new Date(fecha);
+let total=(a*pa)+(ni*pn);
 
-if(fechaSel < hoy){
-alert("No puedes elegir fechas pasadas");
-return;
+factura.innerHTML=`
+<div class='factura'>
+<h3>Resumen</h3>
+Adulto: $${formatear(pa)}<br>
+Niño: $${formatear(pn)}<br><br>
+<strong>Total: $${formatear(total)}</strong><br><br>
+
+<input type='file' id='comprobante'><br>
+<button onclick='confirmar(${total})'>Confirmar Pago</button>
+</div>`;
 }
 
-let precioAdulto = promoActiva ? 20000 : 25000;
-let precioNino = promoActiva ? 10000 : 15000;
-
-let total=(adultos*precioAdulto)+(ninos*precioNino);
-
-document.getElementById("factura").innerHTML=
-"<div class='factura'>"+
-"<h3>Resumen de Reserva</h3>"+
-"Cliente: "+nombre+"<br>"+
-"Fecha: "+fecha+"<br>"+
-"Adulto: $"+formatear(precioAdulto)+"<br>"+
-"Niño: $"+formatear(precioNino)+"<br>"+
-"<strong>Total: $"+formatear(total)+"</strong><br><br>"+
-
-"<div class='promo'>"+
-"🔒 Pago seguro<br><br>"+
-
-"<strong>Nequi:</strong><br>"+
-"321 277 3549<br><br>"+
-
-"<strong>Bancolombia:</strong><br>"+
-"84.943.216.770<br>"+
-"Oneida Beltran<br>"+
-"Cc: 35.285.659<br><br>"+
-
-"<strong>Llave BRE:</strong><br>"+
-"86065356"+
-
-"</div><br>"+
-
-"<input type='file' id='comprobante'><br>"+
-
-"<button onclick='confirmar("+total+")'>Confirmar Pago</button>"+
-"</div>";
-}
-
+// confirmar
 function confirmar(total){
 
-if(document.getElementById("comprobante").files.length==0){
+if(!comprobante.files.length){
 alert("Sube el comprobante");
 return;
 }
 
-let nombre=document.getElementById("nombre").value;
-let fecha=document.getElementById("fecha").value;
-let adultos=document.getElementById("adultos").value;
-let ninos=document.getElementById("ninos").value;
+let n=nombre.value,f=fecha.value,a=adultos.value,ni=ninos.value;
+let c=Math.floor(Math.random()*900000+100000);
 
-let codigo=Math.floor(Math.random()*900000+100000);
+guardarReserva(c,{nombre:n,fecha:f,adultos:a,ninos:ni,total});
 
-guardarReserva(codigo,{
-nombre,fecha,adultos,ninos,total,estado:"activo"
-});
+// mensaje WhatsApp
+let msg=`Hola 👋%0A%0AHe realizado el pago en *Hotel Ventana al Llano* 🌿%0A%0A👤 ${n}%0A📅 ${f}%0A👥 Adultos: ${a}%0A👶 Niños: ${ni}%0A💰 Total: $${formatear(total)}%0A%0AAdjunto comprobante 🙌`;
 
-let tipoTarifa = promoActiva ? "PROMOCIÓN MIÉRCOLES" : "Tarifa normal";
+window.open("https://wa.me/573113822023?text="+msg);
 
-let mensaje="Hola 👋✨%0A%0A"+
-"He realizado el pago en *Hotel Ventana al Llano* 🌿%0A%0A"+
-"👤 "+nombre+"%0A"+
-"📅 "+fecha+"%0A%0A"+
-"👥 Adultos: "+adultos+" ($"+formatear(promoActiva?20000:25000)+")%0A"+
-"👶 Niños: "+ninos+" ($"+formatear(promoActiva?10000:15000)+")%0A"+
-"🎟 "+tipoTarifa+"%0A%0A"+
-"💰 Total: $"+formatear(total)+"%0A%0A"+
-"Adjunto comprobante 🙌";
+// descarga
+descargarReserva({nombre:n,fecha:f,total,codigo:c});
 
-window.open("https://wa.me/573113822023?text="+mensaje);
+// pase
+pase.innerHTML=`
+<div class='pase'>
+<h3>🎟 PASE OFICIAL</h3>
+${n}<br>${f}<br>${c}
+<div id='qr'></div>
+<button onclick='window.print()'>Descargar</button>
+</div>`;
 
-document.getElementById("pase").innerHTML=
-"<div class='pase'>"+
-"<img src='logo.png' width='200'><br>"+
-"<h3>PASE OFICIAL</h3>"+
-"Cliente: "+nombre+"<br>"+
-"Fecha: "+fecha+"<br>"+
-"Código: "+codigo+"<br>"+
-"<div id='qr'></div><br>"+
-"<button onclick='window.print()'>Descargar</button>"+
-"</div>";
-
-new QRCode(document.getElementById("qr"), {
-text: codigo.toString(),
-width: 120,
-height: 120
+new QRCode(document.getElementById("qr"),{
+text:c.toString(),
+width:120,
+height:120
 });
 }
 
