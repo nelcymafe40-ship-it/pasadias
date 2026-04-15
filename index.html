@@ -7,6 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
+
 body{
 font-family:'Segoe UI',sans-serif;
 text-align:center;
@@ -14,6 +15,7 @@ margin:0;
 background:linear-gradient(135deg,#d4fc79,#96e6a1);
 }
 
+/* BARRA */
 .soporte{
 background:linear-gradient(90deg,#11998e,#38ef7d);
 color:white;
@@ -39,8 +41,12 @@ animation:mover 20s linear infinite;
 
 .container{margin-top:120px;}
 
-.logo{width:220px;margin-top:10px;}
+.logo{
+width:220px;
+margin-top:10px;
+}
 
+/* CARD */
 .card{
 background:rgba(255,255,255,0.95);
 padding:25px;
@@ -91,6 +97,7 @@ margin-top:10px;
 font-weight:bold;
 }
 
+/* BOTONES */
 .whatsapp{
 position:fixed;
 bottom:20px;
@@ -114,23 +121,14 @@ text-decoration:none;
 font-weight:bold;
 }
 
-.qr-container{
-display:flex;
-justify-content:center;
-gap:20px;
-flex-wrap:wrap;
-margin-top:10px;
-}
-
-.qr-box{text-align:center;}
-
-#qr,#qrPago{margin-top:10px;}
+#qr{margin-top:10px;}
 
 @media print {
 body * { visibility: hidden; }
 .pase, .pase * { visibility: visible; }
 .pase { position:absolute; top:0; left:0; width:100%; }
 }
+
 </style>
 </head>
 
@@ -155,8 +153,8 @@ onerror="this.src='https://cdn-icons-png.flaticon.com/512/139/139899.png'">
 
 <div id="promoTexto"></div>
 
-<input type="number" id="adultos" value="0"><br>
-<input type="number" id="ninos" value="0"><br>
+<input type="number" id="adultos" placeholder="Adultos" value="0"><br>
+<input type="number" id="ninos" placeholder="Niños" value="0"><br>
 
 <button onclick="comprar()">Calcular</button>
 </div>
@@ -173,18 +171,17 @@ class="instagram" target="_blank">📷 Instagram</a>
 
 <script>
 
-// WhatsApp soporte
 function abrirWhatsApp(){
 let mensaje="Hola 👋✨, quiero información sobre los pasadías en Hotel Ventana al Llano 🌿";
-window.open("https://wa.me/573113822023?text="+encodeURIComponent(mensaje));
+let url="https://wa.me/573113822023?text="+encodeURIComponent(mensaje);
+window.open(url);
 }
 
-// barra
 let mensajes=[
-"📞 Atención al cliente:311-382-2023 (toca aquí)",
+"📞 Atención al cliente (toca aquí)",
 "🌿 Bienvenido a Ventana al Llano",
 "🔥 Aprovecha nuestros pasadías",
-"💳 Pagos fáciles, aceptamos nequi, Bancolombia y bre-b",
+"💳 Pagos fáciles",
 "🎟 Reserva aquí"
 ];
 
@@ -199,9 +196,10 @@ function formatear(n){return n.toLocaleString("es-CO");}
 let promoActiva=false;
 
 function verificarHoy(){
-if(new Date().getDay()===3){
+let hoy=new Date();
+if(hoy.getDay()===3){
 promoActiva=true;
-mensajeHoy.innerHTML="<div class='alerta'>🔥 PROMO MIÉRCOLES ACTIVA</div>";
+mensajeHoy.innerHTML="<div class='alerta'>🔥 HOY ES MIÉRCOLES: PROMO ACTIVA</div>";
 }
 }
 
@@ -214,11 +212,23 @@ promoTexto.innerHTML=promoActiva
 : "";
 }
 
-// COMPRA
-function comprar(){
+function guardarReserva(c,d){
+let r=JSON.parse(localStorage.getItem("reservas"))||{};
+r[c]=d;
+localStorage.setItem("reservas",JSON.stringify(r));
+}
 
-let a=parseInt(adultos.value)||0;
-let ni=parseInt(ninos.value)||0;
+function descargarReserva(data){
+let txt=`RESERVA\nNombre:${data.nombre}\nFecha:${data.fecha}\nTotal:$${formatear(data.total)}\nCodigo:${data.codigo}`;
+let blob=new Blob([txt]);
+let a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="reserva_"+data.codigo+".txt";
+a.click();
+}
+
+function comprar(){
+let n=nombre.value,f=fecha.value,a=+adultos.value,ni=+ninos.value;
 
 let pa=promoActiva?20000:25000;
 let pn=promoActiva?10000:15000;
@@ -227,124 +237,80 @@ let total=(a*pa)+(ni*pn);
 
 factura.innerHTML=`
 <div class='factura'>
-
-<h3>Resumen de Reserva</h3>
-
-Adultos: ${a} ($${formatear(pa)})<br>
-Niños: ${ni} ($${formatear(pn)})<br><br>
-
+<h3>Resumen</h3>
+Adulto: $${formatear(pa)}<br>
+Niño: $${formatear(pn)}<br><br>
 <strong>Total: $${formatear(total)}</strong><br><br>
 
-<div class='promo'>
-🔒 Pago seguro<br><br>
-
-<strong>Nequi:</strong><br>
-321 277 3549<br>
-Oneida Beltrán<br><br>
-
-<strong>Bancolombia:</strong><br>
-84943216770 - Ahorros<br>
-Oneida Beltrán<br>
-CC: 35285659<br><br>
-
-<strong>Llave BRE:</strong><br>
-86065356
-</div><br>
-
 <input type='file' id='comprobante'><br>
-
 <button onclick='confirmar(${total})'>Confirmar Pago</button>
-
 </div>`;
 }
 
-// CONFIRMAR
 function confirmar(total){
 
 if(!comprobante.files.length){
-alert("⚠️ Debes subir el comprobante de pago antes de continuar");
+alert("Sube el comprobante");
 return;
 }
 
 let n=nombre.value,f=fecha.value,a=adultos.value,ni=ninos.value;
+let c=Math.floor(Math.random()*900000+100000);
 
-let tipo = promoActiva ? "PROMO MIÉRCOLES" : "TARIFA NORMAL";
+guardarReserva(c,{nombre:n,fecha:f,adultos:a,ninos:ni,total});
 
-// QR reserva
-let infoQR =
-"Hotel Ventana al Llano\n"+
-"Cliente: "+n+"\n"+
-"Fecha: "+f+"\n"+
-"Adultos: "+a+"\n"+
-"Niños: "+ni+"\n"+
-"Total: $"+formatear(total)+"\n"+
-"Tipo: "+tipo;
+// WhatsApp
+let msg=`Hola 👋%0A%0AHe realizado el pago en *Hotel Ventana al Llano* 🌿%0A%0A👤 ${n}%0A📅 ${f}%0A👥 Adultos: ${a}%0A👶 Niños: ${ni}%0A💰 Total: $${formatear(total)}%0A%0AAdjunto comprobante 🙌`;
+window.open("https://wa.me/573113822023?text="+msg);
 
-// QR pago
-let pagoQR =
-"PAGO - Hotel Ventana al Llano\n\n"+
-"Total: $"+formatear(total)+"\n\n"+
-"Nequi: 3212773549\n"+
-"Oneida Beltrán\n\n"+
-"Bancolombia: 84943216770\n"+
-"Ahorros\n"+
-"CC: 35285659\n\n"+
-"Llave BRE: 86065356";
+// descarga
+descargarReserva({nombre:n,fecha:f,total,codigo:c});
+
+// 🔥 PASE DINÁMICO
+let pa=promoActiva?20000:25000;
+let pn=promoActiva?10000:15000;
+
+let detalle="";
+
+if(a > 0){
+detalle += `
+<div style="background:#ff9800;color:white;padding:12px;border-radius:12px;margin:6px;">
+<strong>Hotel Ventana al Llano</strong><br>
+Adulto 🧑<br>
+Cantidad: ${a}<br>
+Valor: $${formatear(pa)}
+</div>`;
+}
+
+if(ni > 0){
+detalle += `
+<div style="background:#e53935;color:white;padding:12px;border-radius:12px;margin:6px;">
+<strong>Hotel Ventana al Llano</strong><br>
+Niño 👶<br>
+Cantidad: ${ni}<br>
+Valor: $${formatear(pn)}
+</div>`;
+}
 
 pase.innerHTML=`
 <div class='pase'>
-
 <h3>🎟 PASE OFICIAL</h3>
-${n}<br>${f}<br><br>
+Cliente: ${n}<br>
+Fecha: ${f}<br>
+Código: ${c}<br><br>
 
-<div class="qr-container">
+${detalle}
 
-<div class="qr-box">
-<strong>Reserva</strong>
-<div id="qr"></div>
-</div>
-
-<div class="qr-box">
-<strong>Pago</strong>
-<div id="qrPago"></div>
-</div>
-
-</div>
-
-<br>
-
-<div class="alerta">
-📌 Guarda este pase y envía el comprobante por WhatsApp para validar tu entrada
-</div>
-
-<br>
+<div id='qr'></div><br>
 
 <button onclick='window.print()'>Descargar</button>
-
 </div>`;
 
-// QRs
 new QRCode(document.getElementById("qr"),{
-text: infoQR,
+text:c.toString(),
 width:120,
 height:120
 });
-
-new QRCode(document.getElementById("qrPago"),{
-text: pagoQR,
-width:120,
-height:120
-});
-
-// 🔥 AQUÍ VOLVIÓ LO QUE TE FALTABA
-let mensajeWA = encodeURIComponent(
-"Hola, ya realicé el pago. Adjunto el comprobante en este chat."
-);
-
-setTimeout(() => {
-window.open("https://wa.me/573113822023?text=" + mensajeWA, "_blank");
-}, 1500);
-
 }
 
 </script>
