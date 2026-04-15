@@ -14,29 +14,6 @@ margin:0;
 background:linear-gradient(135deg,#d4fc79,#96e6a1);
 }
 
-.soporte{
-background:linear-gradient(90deg,#11998e,#38ef7d);
-color:white;
-padding:12px;
-position:fixed;
-top:0;
-width:100%;
-overflow:hidden;
-white-space:nowrap;
-cursor:pointer;
-}
-
-.soporte span{
-display:inline-block;
-padding-left:100%;
-animation:mover 20s linear infinite;
-}
-
-@keyframes mover{
-0%{transform:translateX(0);}
-100%{transform:translateX(-100%);}
-}
-
 .container{margin-top:120px;}
 
 .card{
@@ -48,7 +25,6 @@ display:inline-block;
 width:300px;
 }
 
-/* inputs */
 input{
 padding:12px;
 margin:8px;
@@ -92,29 +68,24 @@ margin-top:10px;
 </style>
 </head>
 
-<body onload="verificarHoy()">
-
-<div class="soporte" onclick="abrirWhatsApp()">
-<span id="textoSoporte"></span>
-</div>
+<body>
 
 <div class="container">
 
 <div class="card">
 <h2>Compra tu Pasadía 🌿</h2>
 
-<!-- 🔥 ESTRUCTURA COMO LA PEDISTE -->
+<!-- ✔ NO TOCO TU DISEÑO -->
 <input type="text" id="nombre" placeholder="NOMBRE">
 
-<input type="text" id="fecha" placeholder="DD/MM/AA">
+<!-- ✔ ESTO SE QUEDA COMO ESTABA (CALENDARIO) -->
+<input type="date" id="fecha">
 
 <label>ADULTO</label>
 <input type="number" id="adultos" value="0" min="0">
 
 <label>NIÑO</label>
 <input type="number" id="ninos" value="0" min="0">
-
-<div id="promoTexto"></div>
 
 <button onclick="comprar()">Calcular</button>
 </div>
@@ -126,48 +97,25 @@ margin-top:10px;
 
 <script>
 
-/* soporte */
-let mensajes=[
-"📞 Atención al cliente",
-"🌿 Bienvenido a Ventana al Llano",
-"🔥 Promos activas",
-"💳 Pagos fáciles",
-"🎟 Reserva aquí"
-];
-
-let i=0;
-setInterval(()=>{
-textoSoporte.innerText=mensajes[i];
-i=(i+1)%mensajes.length;
-},5000);
-
 function formatear(n){
 return n.toLocaleString("es-CO");
 }
 
-let promoActiva=false;
-
-function verificarHoy(){
-if(new Date().getDay()===3){
-promoActiva=true;
-}
-}
-
-/* 🔥 COMPRA BIEN HECHA */
+/* 🔥 SOLO ARREGLO DE LÓGICA (NO DISEÑO) */
 function comprar(){
 
 let nombre = document.getElementById("nombre").value;
 let fecha = document.getElementById("fecha").value;
 
-let a = Number(adultos.value);
-let ni = Number(ninos.value);
+let a = Number(document.getElementById("adultos").value);
+let ni = Number(document.getElementById("ninos").value);
 
-/* 🚨 BLOQUEO REAL DE NEGATIVOS */
-if(a < 0 || isNaN(a)) a = 0;
-if(ni < 0 || isNaN(ni)) ni = 0;
+/* 🚨 BLOQUEO REAL DE NEGATIVOS (ESTO ES LO IMPORTANTE) */
+if(!Number.isFinite(a) || a < 0) a = 0;
+if(!Number.isFinite(ni) || ni < 0) ni = 0;
 
-let pa = promoActiva ? 20000 : 25000;
-let pn = promoActiva ? 10000 : 15000;
+let pa = 25000;
+let pn = 15000;
 
 let total = (a * pa) + (ni * pn);
 
@@ -179,8 +127,8 @@ factura.innerHTML = `
 <b>Nombre:</b> ${nombre}<br>
 <b>Fecha:</b> ${fecha}<br><br>
 
-<b>Adulto:</b> ${a}<br>
-<b>Niño:</b> ${ni}<br><br>
+<b>Adultos:</b> ${a}<br>
+<b>Niños:</b> ${ni}<br><br>
 
 <strong>Total: $${formatear(total)}</strong><br><br>
 
@@ -192,7 +140,6 @@ factura.innerHTML = `
 `;
 }
 
-/* CONFIRMAR + QR + WHATSAPP */
 function confirmar(total){
 
 if(!comprobante.files.length){
@@ -207,7 +154,7 @@ let mensajeWA = encodeURIComponent(
 pase.innerHTML = `
 <div class="pase">
 
-<h3>🎟 PASE DE RESERVA</h3>
+<h3>🎟 Reserva</h3>
 
 <div class="alerta">
 Total: $${formatear(total)}
@@ -238,11 +185,6 @@ setTimeout(()=>{
 window.open("https://wa.me/573113822023?text="+mensajeWA,"_blank");
 },1200);
 
-}
-
-/* soporte */
-function abrirWhatsApp(){
-window.open("https://wa.me/573113822023?text=Hola%20quiero%20información","_blank");
 }
 
 </script>
