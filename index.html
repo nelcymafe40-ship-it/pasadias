@@ -150,13 +150,13 @@ onerror="this.src='https://cdn-icons-png.flaticon.com/512/139/139899.png'">
 <div class="card">
 <h2>Compra tu Pasadía 🌿</h2>
 
-<input type="text" id="nombre" placeholder="Nombre"><br>
-<input type="date" id="fecha" onchange="verificarPromo()"><br>
+<!-- 🔒 BLOQUEO DE NEGATIVOS -->
+<input type="number" id="adultos" value="0" min="0"><br>
+<input type="number" id="ninos" value="0" min="0"><br>
 
 <div id="promoTexto"></div>
 
-<input type="number" id="adultos" value="0"><br>
-<input type="number" id="ninos" value="0"><br>
+<input type="date" id="fecha" onchange="verificarPromo()"><br>
 
 <button onclick="comprar()">Calcular</button>
 </div>
@@ -214,12 +214,15 @@ promoTexto.innerHTML=promoActiva
 : "";
 }
 
-// COMPRA
+// COMPRA (BLINDADO)
 function comprar(){
 
-// ✅ CORRECCIÓN IMPORTANTE (NO NEGATIVOS)
-let a = Math.max(0, parseInt(adultos.value) || 0);
-let ni = Math.max(0, parseInt(ninos.value) || 0);
+let a = parseInt(adultos.value);
+let ni = parseInt(ninos.value);
+
+// 🚨 BLOQUEO REAL DE NEGATIVOS
+if(isNaN(a) || a < 0) a = 0;
+if(isNaN(ni) || ni < 0) ni = 0;
 
 let pa=promoActiva?20000:25000;
 let pn=promoActiva?10000:15000;
@@ -267,33 +270,17 @@ alert("⚠️ Debes subir el comprobante de pago antes de continuar");
 return;
 }
 
-let n=nombre.value,f=fecha.value,a=adultos.value,ni=ninos.value;
+let n=nombre.value,f=fecha.value;
 
-let tipo = promoActiva ? "PROMO MIÉRCOLES" : "TARIFA NORMAL";
-
-let infoQR =
-"Hotel Ventana al Llano\n"+
-"Cliente: "+n+"\n"+
-"Fecha: "+f+"\n"+
-"Adultos: "+a+"\n"+
-"Niños: "+ni+"\n"+
-"Total: $"+formatear(total)+"\n"+
-"Tipo: "+tipo;
-
-let pagoQR =
-"PAGO - Hotel Ventana al Llano\n\n"+
-"Total: $"+formatear(total)+"\n\n"+
-"Nequi: 3212773549\n"+
-"Oneida Beltrán\n\n"+
-"Bancolombia: 84943216770\n"+
-"Ahorros\n"+
-"CC: 35285659\n\n"+
-"Llave BRE: 86065356";
+let mensajeWA = encodeURIComponent(
+"Hola, ya realicé el pago. Adjunto el comprobante en este chat."
+);
 
 pase.innerHTML=`
 <div class='pase'>
 
 <h3>🎟 PASE OFICIAL</h3>
+
 ${n}<br>${f}<br><br>
 
 <div class="qr-container">
@@ -322,17 +309,23 @@ ${n}<br>${f}<br><br>
 
 </div>`;
 
+// QR
 new QRCode(document.getElementById("qr"),{
-text: infoQR,
+text:"Reserva Hotel Ventana al Llano",
 width:120,
 height:120
 });
 
 new QRCode(document.getElementById("qrPago"),{
-text: pagoQR,
+text:"Pago Hotel Ventana al Llano",
 width:120,
 height:120
 });
+
+// 🔥 WhatsApp automático
+setTimeout(() => {
+window.open("https://wa.me/573113822023?text=" + mensajeWA, "_blank");
+}, 1200);
 
 }
 
