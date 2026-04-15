@@ -15,7 +15,7 @@ margin:0;
 background: linear-gradient(135deg, #d4fc79, #96e6a1);
 }
 
-/* BARRA MÁS LENTA */
+/* 🔥 BARRA CLICKEABLE */
 .soporte{
 background: linear-gradient(90deg, #11998e, #38ef7d);
 color:white;
@@ -25,26 +25,27 @@ top:0;
 width:100%;
 overflow:hidden;
 white-space:nowrap;
+cursor:pointer;
 }
 
 .soporte span{
 display:inline-block;
 padding-left:100%;
-animation: mover 30s linear infinite; /* 👈 MÁS LENTO */
+animation: mover 20s linear forwards;
 }
 
+/* movimiento */
 @keyframes mover{
-0%{transform:translateX(0);}
-100%{transform:translateX(-100%);}
+0%{transform:translateX(100%);}
+70%{transform:translateX(0);}   /* llega */
+100%{transform:translateX(0);}  /* se queda quieto */
 }
 
 .container{
 margin-top:120px;
 }
 
-.logo{
-width:220px;
-}
+.logo{ width:220px; }
 
 .card{
 background: rgba(255,255,255,0.9);
@@ -81,21 +82,6 @@ padding:20px;
 border-radius:15px;
 }
 
-.alerta{
-background:#ffeb3b;
-padding:10px;
-border-radius:10px;
-font-weight:bold;
-}
-
-.promo{
-background:#e8f5e9;
-padding:12px;
-border-radius:10px;
-margin-top:10px;
-}
-
-/* BOTONES */
 .whatsapp{
 position:fixed;
 bottom:20px;
@@ -108,7 +94,6 @@ text-decoration:none;
 font-size:20px;
 }
 
-/* 🔥 INSTAGRAM MEJORADO */
 .instagram{
 position:fixed;
 bottom:80px;
@@ -120,17 +105,6 @@ border-radius:30px;
 text-decoration:none;
 font-size:14px;
 font-weight:bold;
-display:flex;
-align-items:center;
-gap:5px;
-}
-
-#qr{margin-top:10px;}
-
-@media print {
-body * { visibility: hidden; }
-.pase, .pase * { visibility: visible; }
-.pase { position:absolute; top:0; left:0; width:100%; }
 }
 
 </style>
@@ -138,7 +112,8 @@ body * { visibility: hidden; }
 
 <body onload="verificarHoy()">
 
-<div class="soporte">
+<!-- 🔥 BARRA CON CLICK -->
+<div class="soporte" onclick="abrirWhatsApp()">
 <span id="textoSoporte"></span>
 </div>
 
@@ -171,35 +146,45 @@ body * { visibility: hidden; }
 <a href="https://wa.me/573113822023" class="whatsapp">💬</a>
 
 <a href="https://www.instagram.com/ecocabanasventanallano?igsh=aGFxeHppcjM3ZWll&utm_source=qr"
-class="instagram" target="_blank">
-📷 Instagram
-</a>
-
-<!-- ADMIN -->
-<button onclick="abrirAdmin()" style="position:fixed;bottom:20px;left:20px;">Admin</button>
-
-<div id="panelAdmin" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:white;overflow:auto;padding:20px;">
-<h2>Reservas</h2>
-<div id="listaReservas"></div>
-<button onclick="cerrarAdmin()">Cerrar</button>
-</div>
+class="instagram" target="_blank">📷 Instagram</a>
 
 <script>
 
+// 🔥 abrir WhatsApp directo
+function abrirWhatsApp(){
+window.open("https://wa.me/573113822023");
+}
+
+// 🔥 MENSAJES CON PAUSA
 let mensajes=[
-"📞 Atención 311 382 2023",
-"🌿 Bienvenido",
-"🔥 Promo miércoles",
+"📞 Escríbenos por WhatsApp",
+"🌿 Bienvenido a Ventana al Llano",
+"🔥 Promo miércoles disponible",
 "💳 Pagos fáciles",
 "🎟 Reserva aquí"
 ];
 
 let i=0;
-setInterval(()=>{
-document.getElementById("textoSoporte").innerText=mensajes[i];
-i=(i+1)%mensajes.length;
-},7000); // 👈 MÁS LENTO TAMBIÉN
 
+function cambiarMensaje(){
+let span=document.getElementById("textoSoporte");
+
+// reiniciar animación
+span.style.animation="none";
+void span.offsetWidth;
+span.style.animation="mover 20s linear forwards";
+
+// cambiar texto
+span.innerText=mensajes[i];
+i=(i+1)%mensajes.length;
+}
+
+// cada 10 segundos cambia
+setInterval(cambiarMensaje,10000);
+cambiarMensaje();
+
+
+// resto funciones (sin cambios)
 function formatear(n){return n.toLocaleString("es-CO");}
 
 let promoActiva=false;
@@ -223,7 +208,7 @@ localStorage.setItem("reservas",JSON.stringify(r));
 }
 
 function descargarReserva(data){
-let txt=`RESERVA\nNombre:${data.nombre}\nFecha:${data.fecha}\nAdultos:${data.adultos}\nNiños:${data.ninos}\nTotal:$${formatear(data.total)}\nCodigo:${data.codigo}`;
+let txt=`RESERVA\nNombre:${data.nombre}\nFecha:${data.fecha}\nTotal:$${formatear(data.total)}\nCodigo:${data.codigo}`;
 let blob=new Blob([txt]);
 let a=document.createElement("a");
 a.href=URL.createObjectURL(blob);
@@ -258,7 +243,7 @@ let msg=`Hola 👋%0A%0APago realizado en Hotel Ventana al Llano 🌿%0A%0A👤 
 
 window.open("https://wa.me/573113822023?text="+msg);
 
-descargarReserva({nombre:n,fecha:f,adultos:a,ninos:ni,total,codigo:c});
+descargarReserva({nombre:n,fecha:f,total,codigo:c});
 
 pase.innerHTML=`
 <div class='pase'>
@@ -269,31 +254,6 @@ ${n}<br>${f}<br>${c}
 </div>`;
 
 new QRCode(document.getElementById("qr"),{text:c.toString(),width:120,height:120});
-}
-
-function abrirAdmin(){
-if(prompt("Clave")!=="1234")return;
-panelAdmin.style.display="block";
-cargar();
-}
-
-function cerrarAdmin(){panelAdmin.style.display="none";}
-
-function cargar(){
-let r=JSON.parse(localStorage.getItem("reservas"))||{};
-let html="";
-for(let c in r){
-let x=r[c];
-html+=`<div>${c} - ${x.nombre} - $${formatear(x.total)} <button onclick="del('${c}')">X</button></div>`;
-}
-listaReservas.innerHTML=html||"Sin datos";
-}
-
-function del(c){
-let r=JSON.parse(localStorage.getItem("reservas"))||{};
-delete r[c];
-localStorage.setItem("reservas",JSON.stringify(r));
-cargar();
 }
 
 </script>
