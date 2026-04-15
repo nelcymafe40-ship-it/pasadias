@@ -27,42 +27,30 @@ z-index:999;
 .soporte span{
 display:inline-block;
 padding-left:100%;
-animation:mover 12s linear infinite;
+animation:mover 25s linear infinite;
 }
 
 @keyframes mover{
-0%{transform:translateX(100%); opacity:0;}
-10%{opacity:1;}
-90%{opacity:1;}
-100%{transform:translateX(-100%); opacity:0;}
+0%{transform:translateX(100%);}
+100%{transform:translateX(-100%);}
 }
 
-.container{margin-top:120px;}
+.container{
+margin-top:120px;
+}
 
 .logo{
-width:260px;
+width:230px;
 margin-bottom:10px;
 }
 
-.slogan{
-font-style:italic;
-color:#2e7d32;
-margin-bottom:20px;
-}
-
 .card{
-background:rgba(255,255,255,0.95);
+background:white;
 padding:25px;
 border-radius:20px;
 box-shadow:0 10px 30px rgba(0,0,0,0.2);
 display:inline-block;
-width:300px;
-transition:0.3s;
-}
-
-.promo-activa{
-border:3px solid #00c853;
-box-shadow:0 0 20px rgba(0,200,83,0.6);
+width:340px;
 }
 
 input{
@@ -83,21 +71,44 @@ border:none;
 border-radius:10px;
 cursor:pointer;
 width:100%;
+font-weight:bold;
 }
 
 .factura{
 margin-top:20px;
 background:white;
-padding:20px;
+padding:15px;
 border-radius:15px;
+border:2px dashed #00c853;
+text-align:left;
 }
 
-.galeria img{
-width:90%;
-max-width:300px;
-border-radius:15px;
+.promo{
+background:#00c853;
+color:white;
+padding:12px;
+border-radius:10px;
+font-weight:bold;
+text-align:center;
 margin:10px 0;
-box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
+.pagos{
+background:#f7fff7;
+padding:15px;
+border-radius:12px;
+margin-top:10px;
+font-size:14px;
+}
+
+.codigo{
+background:#000;
+color:#00ff88;
+padding:10px;
+border-radius:8px;
+text-align:center;
+font-weight:bold;
+margin-top:10px;
 }
 
 .whatsapp{
@@ -109,6 +120,7 @@ color:white;
 padding:15px;
 border-radius:50%;
 text-decoration:none;
+font-size:20px;
 }
 
 .instagram{
@@ -135,15 +147,13 @@ font-weight:bold;
 
 <img src="logo.jpg" class="logo">
 
-<div class="slogan">🌿 Donde la naturaleza se convierte en descanso 🌿</div>
-
 <div class="card">
-<h2>Compra tu Pasadía 🌿</h2>
 
-<label><b>Nombre:</b></label>
-<input type="text" id="nombre" placeholder="Escribe tu nombre">
+<h2>Compra tu Pasadía "HOTEL VENTANA AL LLANO" 🌿</h2>
 
-<label><b>Fecha de visita:</b></label>
+<input type="text" id="nombre" placeholder="Nombre completo">
+
+<label><b>Fecha de visita</b></label>
 <input type="date" id="fecha" onchange="verificarPromo()">
 
 <div id="promoTexto"></div>
@@ -157,66 +167,54 @@ font-weight:bold;
 <button onclick="comprar()">Calcular total</button>
 
 <div id="factura"></div>
-</div>
-
-<div class="galeria">
-<h3>Conoce nuestras instalaciones</h3>
-<img src="foto1.jpg">
-<img src="foto2.jpg">
-<img src="foto3.jpg">
-</div>
 
 </div>
+</div>
 
-<a href="https://www.instagram.com/ecocabanasventanallano" 
+<a href="https://www.instagram.com/ecocabanasventanallano"
 class="instagram" target="_blank">📷</a>
 
 <a href="#" onclick="abrirWhatsApp()" class="whatsapp">💬</a>
 
 <script>
 
-let mensajes = [
+let mensajes=[
 "🌿 Bienvenido a Hotel Ventana al Llano",
 "🎟 Reserva tu pasadía aquí",
 "💳 Pagos por Nequi, Bancolombia y Llave",
 "🔥 Promociones todos los miércoles",
-"📞 Escríbenos por WhatsApp"
+"🍽️ Los lunes no manejamos servicio de restaurante",
+"📞 Atención por WhatsApp ¡TE ESPERAMOS!"
 ];
 
-let i = 0;
-
+let i=0;
 function cambiarMensaje(){
-document.getElementById("textoSoporte").innerText = mensajes[i];
-i = (i + 1) % mensajes.length;
+textoSoporte.innerText=mensajes[i];
+i=(i+1)%mensajes.length;
 }
-
 setInterval(cambiarMensaje,4000);
 cambiarMensaje();
 
 function verificarPromo(){
-let fechaInput = document.getElementById("fecha").value;
-let f = fechaInput ? new Date(fechaInput) : new Date();
+let fecha=document.getElementById("fecha").value;
+let f=fecha?new Date(fecha):new Date();
 
 if(f.getDay()===3){
-document.getElementById("promoTexto").innerHTML=`
-<div style="
-background:#00c853;
-color:white;
-padding:15px;
-border-radius:12px;
-font-size:22px;
-font-weight:bold;
-margin-bottom:10px;
-">
-🔥 PROMOCIÓN DÍA DE HOY MIÉRCOLES
+promoTexto.innerHTML=`
+<div class="promo">
+🔥 PROMOCIÓN DÍA DE HOY MIÉRCOLES 🔥
 </div>`;
 }else{
-document.getElementById("promoTexto").innerHTML="";
+promoTexto.innerHTML="";
 }
 }
 
 function formatear(n){
 return n.toLocaleString("es-CO");
+}
+
+function generarCodigo(){
+return "RV-"+Math.floor(100000+Math.random()*900000);
 }
 
 function comprar(){
@@ -238,8 +236,9 @@ alert("Debes seleccionar al menos 1 pasadía");
 return;
 }
 
-let fechaInput=document.getElementById("fecha").value;
-let f=fechaInput?new Date(fechaInput):new Date();
+let fecha=document.getElementById("fecha").value;
+let f=fecha?new Date(fecha):new Date();
+
 let esMiercoles=f.getDay()===3;
 
 let precioAdulto=esMiercoles?15000:25000;
@@ -247,26 +246,70 @@ let precioNino=esMiercoles?8000:15000;
 
 let total=(adultos*precioAdulto)+(ninos*precioNino);
 
-document.getElementById("factura").innerHTML=`
+let codigo=generarCodigo();
+
+factura.innerHTML=`
 <div class="factura">
-<b>Resumen</b><br><br>
+
+<b>Resumen de reserva</b><br><br>
+
 Nombre: ${nombre}<br>
+Fecha: ${fecha}<br>
 Adultos: ${adultos}<br>
-Niños: ${ninos}<br><br>
-<b>Total: $${formatear(total)}</b><br><br>
-<button onclick="enviarWhatsApp('${nombre}',${adultos},${ninos},${total})">
-Reservar
+Niños: ${ninos}<br>
+
+${esMiercoles?'<div class="promo">PRECIO PROMOCIÓN MIÉRCOLES</div>':''}
+
+<b>Total a pagar: $${formatear(total)}</b>
+
+<div class="pagos">
+<b>Métodos de pago</b><br><br>
+
+<b>Nequi</b><br>
+321 277 3549<br><br>
+
+<b>Bancolombia</b><br>
+84943216770 - Ahorros<br>
+Oneida Beltran<br>
+CC. 35285659<br><br>
+
+<b>Llave BRE</b><br>
+86065356
+</div>
+
+<div class="codigo">
+Código reserva: ${codigo}
+</div>
+
+<button onclick="enviarWhatsApp('${nombre}',${adultos},${ninos},${total},'${codigo}')">
+Confirmar reserva
 </button>
-</div>`;
+
+</div>
+`;
 }
 
-function enviarWhatsApp(nombre,adultos,ninos,total){
+function enviarWhatsApp(nombre,adultos,ninos,total,codigo){
 
-let mensaje=`Hola, quiero reservar una pasadía 🌿
+let fecha=document.getElementById("fecha").value;
+
+let f=fecha?new Date(fecha):new Date();
+let esMiercoles=f.getDay()===3;
+
+let mensaje=`🌿 RESERVA GENERADA - Hotel Ventana al Llano
+
+Código de reserva: ${codigo}
+
 Nombre: ${nombre}
+Fecha de visita: ${fecha}
+
+Detalle de compra:
 Adultos: ${adultos}
 Niños: ${ninos}
-Total: $${total}`;
+${esMiercoles ? 'Promoción: Miércoles' : ''}
+
+Total a pagar: $${total}
+ANEXO COMPROBANTE DE PAGO POR ESTE MEDIO, PORFAVOR CONFIRMAR`;
 
 window.open("https://wa.me/573113822023?text="+encodeURIComponent(mensaje));
 }
@@ -274,5 +317,20 @@ window.open("https://wa.me/573113822023?text="+encodeURIComponent(mensaje));
 function abrirWhatsApp(){
 
 let mensajes=[
-"Hola, quiero reservar una pasadía 🌿",
-"Hola, quiero más información sobre las pasad
+"Hola, quiero información sobre los pasadías 🌿",
+"Hola, me gustaría conocer disponibilidad",
+"Buenas, quiero reservar",
+"Hola, vengo desde la página web"
+];
+
+let mensaje=mensajes[Math.floor(Math.random()*mensajes.length)];
+
+window.open("https://wa.me/573113822023?text="+encodeURIComponent(mensaje));
+}
+
+verificarPromo();
+
+</script>
+
+</body>
+</html>
