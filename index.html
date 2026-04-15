@@ -6,7 +6,122 @@
 
 <style>
 body{
-font-family:'Segoe UI',sans-serif;
+font-family:'Segoe UI',<script>
+let mensajes = [
+"🌿 Bienvenido a Hotel Ventana al Llano",
+"🎟 Reserva tu pasadía aquí",
+"💳 Pagos por Nequi, Bancolombia y Llave",
+"🔥 Promociones todos los miércoles",
+"📞 Escríbenos por WhatsApp"
+];
+
+let i = 0;
+function cambiarMensaje(){
+document.getElementById("textoSoporte").innerText = mensajes[i];
+i = (i + 1) % mensajes.length;
+}
+setInterval(cambiarMensaje, 4000);
+cambiarMensaje();
+
+function verificarPromo(){
+let fechaInput = document.getElementById("fecha").value;
+let f = fechaInput ? new Date(fechaInput) : new Date();
+let dia = f.getDay();
+
+let card = document.querySelector('.card');
+
+if(dia === 3){
+card.classList.add('promo-activa');
+
+document.getElementById("promoTexto").innerHTML = `
+<div style="
+background:#00c853;
+color:white;
+padding:15px;
+border-radius:12px;
+font-size:22px;
+font-weight:bold;
+box-shadow:0 0 20px rgba(0,200,83,0.7);
+">
+🔥 PROMOCIÓN DÍA DE HOY MIÉRCOLES
+</div>`;
+}else{
+card.classList.remove('promo-activa');
+document.getElementById("promoTexto").innerHTML = "";
+}
+}
+
+function formatear(n){
+return n.toLocaleString("es-CO");
+}
+
+function comprar(){
+
+let nombre = document.getElementById("nombre").value;
+let adultos = parseInt(document.getElementById("adultos").value);
+let ninos = parseInt(document.getElementById("ninos").value);
+
+// corregir
+adultos = isNaN(adultos) || adultos < 0 ? 0 : adultos;
+ninos = isNaN(ninos) || ninos < 0 ? 0 : ninos;
+
+if(!nombre){
+alert("Escribe tu nombre");
+return;
+}
+
+if(adultos === 0 && ninos === 0){
+alert("Debes seleccionar al menos 1 pasadía");
+return;
+}
+
+let fechaInput = document.getElementById("fecha").value;
+let f = fechaInput ? new Date(fechaInput) : new Date();
+let esMiercoles = f.getDay() === 3;
+
+let precioAdulto = esMiercoles ? 15000 : 25000;
+let precioNino = esMiercoles ? 8000 : 15000;
+
+let total = (adultos * precioAdulto) + (ninos * precioNino);
+
+document.getElementById("factura").innerHTML = `
+<div class="factura">
+<b>Resumen</b><br><br>
+Nombre: ${nombre}<br>
+Adultos: ${adultos}<br>
+Niños: ${ninos}<br><br>
+<b>Total: $${formatear(total)}</b><br><br>
+<button onclick="enviarWhatsApp('${nombre}',${adultos},${ninos},${total})">
+Reservar
+</button>
+</div>`;
+}
+
+function enviarWhatsApp(nombre, adultos, ninos, total){
+let mensaje = `Hola, quiero reservar una pasadía 🌿
+Nombre: ${nombre}
+Adultos: ${adultos}
+Niños: ${ninos}
+Total: $${total}`;
+
+window.open(`https://wa.me/573113822023?text=${encodeURIComponent(mensaje)}`);
+}
+
+function abrirWhatsApp(){
+let mensajes = [
+"Hola, quiero reservar una pasadía 🌿",
+"Hola, quiero más información sobre las pasadías 😊",
+"Buenas, me gustaría conocer precios y disponibilidad 📅"
+];
+
+let mensaje = mensajes[Math.floor(Math.random()*mensajes.length)];
+
+window.open(`https://wa.me/573113822023?text=${encodeURIComponent(mensaje)}`);
+}
+
+// detectar miércoles automáticamente al cargar
+verificarPromo();
+</script>;
 text-align:center;
 margin:0;
 background:linear-gradient(135deg,#d4fc79,#96e6a1);
