@@ -103,6 +103,18 @@ padding:15px;
 border-radius:50%;
 text-decoration:none;
 }
+
+.instagram{
+position:fixed;
+bottom:80px;
+right:20px;
+background:#E1306C;
+color:white;
+padding:12px 15px;
+border-radius:30px;
+text-decoration:none;
+font-weight:bold;
+}
 </style>
 </head>
 
@@ -152,6 +164,10 @@ text-decoration:none;
 
 </div>
 
+<!-- BOTON INSTAGRAM -->
+<a href="https://www.instagram.com/ecocabanasventanallano?igsh=aGFxeHppcjM3ZWll&utm_source=qr" 
+class="instagram" target="_blank">📷</a>
+
 <a href="https://wa.me/573113822023" class="whatsapp">💬</a>
 
 <script>
@@ -197,10 +213,40 @@ return n.toLocaleString("es-CO");
 
 function comprar(){
 let nombre = document.getElementById("nombre").value;
-let adultos = parseInt(document.getElementById("adultos").value);
-let ninos = parseInt(document.getElementById("ninos").value);
+let adultos = parseInt(document.getElementById("adultos").value) || 0;
+let ninos = parseInt(document.getElementById("ninos").value) || 0;
 
-if(!nombre){alert("Escribe tu nombre");return;}
+// VALIDACIONES
+if(!nombre){
+alert("Escribe tu nombre");
+return;
+}
+
+if(adultos < 0 || ninos < 0){
+alert("No se permiten valores negativos");
+return;
+}
+
+if(adultos === 0 && ninos === 0){
+alert("Debes seleccionar al menos 1 pasadía");
+return;
+}
+
+let precioAdulto = promoActiva ? 20000 : 25000;
+let precioNino = promoActiva ? 10000 : 15000;
+
+let total = (adultos * precioAdulto) + (ninos * precioNino);
+
+document.getElementById("factura").innerHTML = `
+<div class="factura">
+<b>Resumen</b><br><br>
+Nombre: ${nombre}<br>
+Adultos: ${adultos}<br>
+Niños: ${ninos}<br><br>
+<b>Total: $${formatear(total)}</b><br><br>
+<button onclick="enviarWhatsApp('${nombre}',${adultos},${ninos},${total})">Reservar</button>
+</div>`;
+}
 
 let precioAdulto = promoActiva ? 20000 : 25000;
 let precioNino = promoActiva ? 10000 : 15000;
