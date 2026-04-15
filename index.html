@@ -14,7 +14,35 @@ margin:0;
 background:linear-gradient(135deg,#d4fc79,#96e6a1);
 }
 
+.soporte{
+background:linear-gradient(90deg,#11998e,#38ef7d);
+color:white;
+padding:12px;
+position:fixed;
+top:0;
+width:100%;
+overflow:hidden;
+white-space:nowrap;
+cursor:pointer;
+}
+
+.soporte span{
+display:inline-block;
+padding-left:100%;
+animation:mover 20s linear infinite;
+}
+
+@keyframes mover{
+0%{transform:translateX(0);}
+100%{transform:translateX(-100%);}
+}
+
 .container{margin-top:120px;}
+
+.logo{
+width:220px;
+margin-top:10px;
+}
 
 .card{
 background:rgba(255,255,255,0.95);
@@ -22,7 +50,7 @@ padding:25px;
 border-radius:20px;
 box-shadow:0 10px 25px rgba(0,0,0,0.2);
 display:inline-block;
-width:300px;
+width:280px;
 }
 
 input{
@@ -58,34 +86,70 @@ border-radius:10px;
 font-weight:bold;
 }
 
-.qr-container{
-display:flex;
-justify-content:center;
-gap:20px;
-flex-wrap:wrap;
+.promo{
+background:#e8f5e9;
+padding:10px;
+border-radius:10px;
 margin-top:10px;
+font-weight:bold;
+}
+
+.whatsapp{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#25D366;
+color:white;
+padding:15px;
+border-radius:50%;
+text-decoration:none;
+}
+
+.instagram{
+position:fixed;
+bottom:80px;
+right:20px;
+background:#E1306C;
+color:white;
+padding:12px 15px;
+border-radius:30px;
+text-decoration:none;
+font-weight:bold;
+}
+
+#qr{margin-top:10px;}
+
+@media print {
+body * { visibility: hidden; }
+.pase, .pase * { visibility: visible; }
+.pase { position:absolute; top:0; left:0; width:100%; }
 }
 </style>
 </head>
 
-<body>
+<body onload="verificarHoy()">
+
+<div class="soporte" onclick="abrirWhatsApp()">
+<span id="textoSoporte"></span>
+</div>
 
 <div class="container">
+
+<img src="logo.png" class="logo"
+onerror="this.src='https://cdn-icons-png.flaticon.com/512/139/139899.png'">
+
+<div id="mensajeHoy"></div>
 
 <div class="card">
 <h2>Compra tu Pasadía 🌿</h2>
 
-<!-- ✔ NO TOCO TU DISEÑO -->
-<input type="text" id="nombre" placeholder="NOMBRE">
+<input type="text" id="nombre" placeholder="Nombre"><br>
+<input type="date" id="fecha" onchange="verificarPromo()"><br>
 
-<!-- ✔ ESTO SE QUEDA COMO ESTABA (CALENDARIO) -->
-<input type="date" id="fecha">
+<div id="promoTexto"></div>
 
-<label>ADULTO</label>
-<input type="number" id="adultos" value="0" min="0">
-
-<label>NIÑO</label>
-<input type="number" id="ninos" value="0" min="0">
+<input type="number" id="adultos" value="0"><br>
+<input type="number" id="ninos" value="0"><br>
 
 <button onclick="comprar()">Calcular</button>
 </div>
@@ -95,96 +159,100 @@ margin-top:10px;
 
 </div>
 
+<a href="https://wa.me/573113822023" class="whatsapp">💬</a>
+
+<a href="https://www.instagram.com/ecocabanasventanallano?igsh=aGFxeHppcjM3ZWll&utm_source=qr"
+class="instagram" target="_blank">📷 Instagram</a>
+
 <script>
 
-function formatear(n){
-return n.toLocaleString("es-CO");
+function abrirWhatsApp(){
+let mensaje="Hola 👋✨, quiero información sobre los pasadías en Hotel Ventana al Llano 🌿";
+window.open("https://wa.me/573113822023?text="+encodeURIComponent(mensaje));
 }
 
-/* 🔥 SOLO ARREGLO DE LÓGICA (NO DISEÑO) */
+let mensajes=[
+"📞 Atención al cliente (toca aquí)",
+"🌿 Bienvenido a Ventana al Llano",
+"🔥 Aprovecha nuestros pasadías",
+"💳 Pagos fáciles",
+"🎟 Reserva aquí"
+];
+
+let i=0;
+setInterval(()=>{
+textoSoporte.innerText=mensajes[i];
+i=(i+1)%mensajes.length;
+},5000);
+
+function formatear(n){return n.toLocaleString("es-CO");}
+
+let promoActiva=false;
+
+function verificarHoy(){
+let hoy=new Date();
+if(hoy.getDay()===3){
+promoActiva=true;
+mensajeHoy.innerHTML="<div class='alerta'>🔥 PROMO MIÉRCOLES ACTIVA</div>";
+}
+}
+
+function verificarPromo(){
+let f=new Date(fecha.value);
+promoActiva=(f.getDay()===3);
+
+promoTexto.innerHTML=promoActiva
+? "<div class='promo'>Adultos $20.000 | Niños $10.000</div>"
+: "";
+}
+
 function comprar(){
+let n=nombre.value,f=fecha.value,a=+adultos.value,ni=+ninos.value;
 
-let nombre = document.getElementById("nombre").value;
-let fecha = document.getElementById("fecha").value;
+let pa=promoActiva?20000:25000;
+let pn=promoActiva?10000:15000;
 
-let a = Number(document.getElementById("adultos").value);
-let ni = Number(document.getElementById("ninos").value);
+let total=(a*pa)+(ni*pn);
 
-/* 🚨 BLOQUEO REAL DE NEGATIVOS (ESTO ES LO IMPORTANTE) */
-if(!Number.isFinite(a) || a < 0) a = 0;
-if(!Number.isFinite(ni) || ni < 0) ni = 0;
-
-let pa = 25000;
-let pn = 15000;
-
-let total = (a * pa) + (ni * pn);
-
-factura.innerHTML = `
-<div class="factura">
-
-<h3>Resumen de Reserva</h3>
-
-<b>Nombre:</b> ${nombre}<br>
-<b>Fecha:</b> ${fecha}<br><br>
-
-<b>Adultos:</b> ${a}<br>
-<b>Niños:</b> ${ni}<br><br>
-
+factura.innerHTML=`
+<div class='factura'>
 <strong>Total: $${formatear(total)}</strong><br><br>
-
-<input type="file" id="comprobante"><br>
-
-<button onclick="confirmar(${total})">Confirmar Pago</button>
-
-</div>
-`;
+<input type='file' id='comprobante'><br>
+<button onclick='confirmar(${total})'>Confirmar</button>
+</div>`;
 }
 
 function confirmar(total){
 
-if(!comprobante.files.length){
-alert("⚠️ Sube el comprobante");
-return;
-}
+if(!comprobante.files.length){alert("Sube comprobante");return;}
 
-let mensajeWA = encodeURIComponent(
-"Hola 👋 ya realicé el pago. Adjunto el comprobante."
-);
+let n=nombre.value,f=fecha.value,a=adultos.value,ni=ninos.value;
 
-pase.innerHTML = `
-<div class="pase">
+let tipo = promoActiva ? "PROMO MIÉRCOLES" : "TARIFA NORMAL";
 
-<h3>🎟 Reserva</h3>
+// 🔥 TEXTO DEL QR (SIN CÓDIGO)
+let infoQR =
+"Hotel Ventana al Llano\n"+
+"Cliente: "+n+"\n"+
+"Fecha: "+f+"\n"+
+"Adultos: "+a+"\n"+
+"Niños: "+ni+"\n"+
+"Total: $"+formatear(total)+"\n"+
+"Tipo: "+tipo;
 
-<div class="alerta">
-Total: $${formatear(total)}
-</div>
-
-<div class="qr-container">
-<div id="qr"></div>
-<div id="qrPago"></div>
-</div>
-
+pase.innerHTML=`
+<div class='pase'>
+<h3>🎟 PASE OFICIAL</h3>
+${n}<br>${f}<br><br>
+<div id='qr'></div>
+<button onclick='window.print()'>Descargar</button>
 </div>`;
 
-/* QR */
 new QRCode(document.getElementById("qr"),{
-text:"Reserva Hotel Ventana al Llano",
+text: infoQR,
 width:120,
 height:120
 });
-
-new QRCode(document.getElementById("qrPago"),{
-text:"Pago Hotel Ventana al Llano",
-width:120,
-height:120
-});
-
-/* WhatsApp automático */
-setTimeout(()=>{
-window.open("https://wa.me/573113822023?text="+mensajeWA,"_blank");
-},1200);
-
 }
 
 </script>
