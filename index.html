@@ -7,7 +7,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
-
 body{
 font-family:'Segoe UI',sans-serif;
 text-align:center;
@@ -15,7 +14,6 @@ margin:0;
 background:linear-gradient(135deg,#d4fc79,#96e6a1);
 }
 
-/* BARRA */
 .soporte{
 background:linear-gradient(90deg,#11998e,#38ef7d);
 color:white;
@@ -46,7 +44,6 @@ width:220px;
 margin-top:10px;
 }
 
-/* CARD */
 .card{
 background:rgba(255,255,255,0.95);
 padding:25px;
@@ -97,7 +94,6 @@ margin-top:10px;
 font-weight:bold;
 }
 
-/* BOTONES */
 .whatsapp{
 position:fixed;
 bottom:20px;
@@ -128,7 +124,6 @@ body * { visibility: hidden; }
 .pase, .pase * { visibility: visible; }
 .pase { position:absolute; top:0; left:0; width:100%; }
 }
-
 </style>
 </head>
 
@@ -153,8 +148,8 @@ onerror="this.src='https://cdn-icons-png.flaticon.com/512/139/139899.png'">
 
 <div id="promoTexto"></div>
 
-<input type="number" id="adultos" placeholder="Adultos" value="0"><br>
-<input type="number" id="ninos" placeholder="Niños" value="0"><br>
+<input type="number" id="adultos" value="0"><br>
+<input type="number" id="ninos" value="0"><br>
 
 <button onclick="comprar()">Calcular</button>
 </div>
@@ -173,8 +168,7 @@ class="instagram" target="_blank">📷 Instagram</a>
 
 function abrirWhatsApp(){
 let mensaje="Hola 👋✨, quiero información sobre los pasadías en Hotel Ventana al Llano 🌿";
-let url="https://wa.me/573113822023?text="+encodeURIComponent(mensaje);
-window.open(url);
+window.open("https://wa.me/573113822023?text="+encodeURIComponent(mensaje));
 }
 
 let mensajes=[
@@ -199,7 +193,7 @@ function verificarHoy(){
 let hoy=new Date();
 if(hoy.getDay()===3){
 promoActiva=true;
-mensajeHoy.innerHTML="<div class='alerta'>🔥 HOY ES MIÉRCOLES: PROMO ACTIVA</div>";
+mensajeHoy.innerHTML="<div class='alerta'>🔥 PROMO MIÉRCOLES ACTIVA</div>";
 }
 }
 
@@ -212,21 +206,6 @@ promoTexto.innerHTML=promoActiva
 : "";
 }
 
-function guardarReserva(c,d){
-let r=JSON.parse(localStorage.getItem("reservas"))||{};
-r[c]=d;
-localStorage.setItem("reservas",JSON.stringify(r));
-}
-
-function descargarReserva(data){
-let txt=`RESERVA\nNombre:${data.nombre}\nFecha:${data.fecha}\nTotal:$${formatear(data.total)}\nCodigo:${data.codigo}`;
-let blob=new Blob([txt]);
-let a=document.createElement("a");
-a.href=URL.createObjectURL(blob);
-a.download="reserva_"+data.codigo+".txt";
-a.click();
-}
-
 function comprar(){
 let n=nombre.value,f=fecha.value,a=+adultos.value,ni=+ninos.value;
 
@@ -237,77 +216,40 @@ let total=(a*pa)+(ni*pn);
 
 factura.innerHTML=`
 <div class='factura'>
-<h3>Resumen</h3>
-Adulto: $${formatear(pa)}<br>
-Niño: $${formatear(pn)}<br><br>
 <strong>Total: $${formatear(total)}</strong><br><br>
-
 <input type='file' id='comprobante'><br>
-<button onclick='confirmar(${total})'>Confirmar Pago</button>
+<button onclick='confirmar(${total})'>Confirmar</button>
 </div>`;
 }
 
 function confirmar(total){
 
-if(!comprobante.files.length){
-alert("Sube el comprobante");
-return;
-}
+if(!comprobante.files.length){alert("Sube comprobante");return;}
 
 let n=nombre.value,f=fecha.value,a=adultos.value,ni=ninos.value;
-let c=Math.floor(Math.random()*900000+100000);
 
-guardarReserva(c,{nombre:n,fecha:f,adultos:a,ninos:ni,total});
+let tipo = promoActiva ? "PROMO MIÉRCOLES" : "TARIFA NORMAL";
 
-// WhatsApp
-let msg=`Hola 👋%0A%0AHe realizado el pago en *Hotel Ventana al Llano* 🌿%0A%0A👤 ${n}%0A📅 ${f}%0A👥 Adultos: ${a}%0A👶 Niños: ${ni}%0A💰 Total: $${formatear(total)}%0A%0AAdjunto comprobante 🙌`;
-window.open("https://wa.me/573113822023?text="+msg);
-
-// descarga
-descargarReserva({nombre:n,fecha:f,total,codigo:c});
-
-// 🔥 PASE DINÁMICO
-let pa=promoActiva?20000:25000;
-let pn=promoActiva?10000:15000;
-
-let detalle="";
-
-if(a > 0){
-detalle += `
-<div style="background:#ff9800;color:white;padding:12px;border-radius:12px;margin:6px;">
-<strong>Hotel Ventana al Llano</strong><br>
-Adulto 🧑<br>
-Cantidad: ${a}<br>
-Valor: $${formatear(pa)}
-</div>`;
-}
-
-if(ni > 0){
-detalle += `
-<div style="background:#e53935;color:white;padding:12px;border-radius:12px;margin:6px;">
-<strong>Hotel Ventana al Llano</strong><br>
-Niño 👶<br>
-Cantidad: ${ni}<br>
-Valor: $${formatear(pn)}
-</div>`;
-}
+// 🔥 TEXTO DEL QR (SIN CÓDIGO)
+let infoQR =
+"Hotel Ventana al Llano\n"+
+"Cliente: "+n+"\n"+
+"Fecha: "+f+"\n"+
+"Adultos: "+a+"\n"+
+"Niños: "+ni+"\n"+
+"Total: $"+formatear(total)+"\n"+
+"Tipo: "+tipo;
 
 pase.innerHTML=`
 <div class='pase'>
 <h3>🎟 PASE OFICIAL</h3>
-Cliente: ${n}<br>
-Fecha: ${f}<br>
-Código: ${c}<br><br>
-
-${detalle}
-
-<div id='qr'></div><br>
-
+${n}<br>${f}<br><br>
+<div id='qr'></div>
 <button onclick='window.print()'>Descargar</button>
 </div>`;
 
 new QRCode(document.getElementById("qr"),{
-text:c.toString(),
+text: infoQR,
 width:120,
 height:120
 });
