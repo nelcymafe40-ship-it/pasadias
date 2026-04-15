@@ -1,10 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <title>Mi página</title>
+<meta charset="UTF-8">
+<title>Validar Pase</title>
+
+<style>
+body{
+font-family: Arial;
+text-align:center;
+margin-top:50px;
+}
+
+input{
+padding:10px;
+margin:10px;
+}
+
+button{
+padding:10px;
+background:green;
+color:white;
+border:none;
+cursor:pointer;
+}
+</style>
 </head>
+
 <body>
-  <h1>Hola corazón 💖</h1>
-  <p>Mi primera página web</p>
+
+<h2>Validar Pase</h2>
+
+<input type="number" id="codigo" placeholder="Código">
+<br>
+<button onclick="validar()">Validar</button>
+
+<div id="resultado"></div>
+
+<script>
+
+function formatear(numero){
+return numero.toLocaleString("es-CO");
+}
+
+function validar(){
+
+let codigo = document.getElementById("codigo").value;
+
+let reservas = JSON.parse(localStorage.getItem("reservas")) || {};
+
+let r = reservas[codigo];
+
+if(!r){
+document.getElementById("resultado").innerHTML="❌ No existe";
+return;
+}
+
+if(r.estado==="usado"){
+document.getElementById("resultado").innerHTML="⚠️ Ya usado";
+return;
+}
+
+r.estado="usado";
+reservas[codigo]=r;
+localStorage.setItem("reservas", JSON.stringify(reservas));
+
+document.getElementById("resultado").innerHTML=
+"✅ VÁLIDO<br>"+
+r.nombre+"<br>"+
+"Total: $"+formatear(r.total);
+
+}
+
+</script>
+
 </body>
 </html>
