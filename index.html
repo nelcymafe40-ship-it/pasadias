@@ -56,6 +56,13 @@ border-radius:20px;
 box-shadow:0 10px 30px rgba(0,0,0,0.2);
 display:inline-block;
 width:300px;
+transition:0.3s;
+}
+
+/* estado promo */
+.promo-activa{
+border:3px solid #00c853;
+box-shadow:0 0 20px rgba(0,200,83,0.6);
 }
 
 input{
@@ -191,21 +198,25 @@ let promoActiva = false;
 
 function verificarPromo(){
 let fechaInput = document.getElementById("fecha").value;
-
-// si no han elegido fecha, usar hoy
 let f = fechaInput ? new Date(fechaInput) : new Date();
-
-// asegurar que tome el día correctamente
 let dia = f.getDay();
+
+let card = document.querySelector('.card');
 
 if(dia === 3){
 promoActiva = true;
+card.classList.add('promo-activa');
+
 document.getElementById("promoTexto").innerHTML = `
-<div style="background:#e8f5e9;padding:10px;border-radius:10px;">
-🔥 PROMOCIÓN MIÉRCOLES<br>
-👨 Adultos: $20.000<br>
-👧 Niños: $10.000
+<div style="background:#c8f7c5;padding:10px;border-radius:10px;font-weight:bold;">
+🔥 PROMOCIÓN MIÉRCOLES ACTIVA
 </div>`;
+
+} else {
+promoActiva = false;
+card.classList.remove('promo-activa');
+document.getElementById("promoTexto").innerHTML = "";
+}
 } else {
 promoActiva = false;
 document.getElementById("promoTexto").innerHTML = "";
@@ -245,8 +256,8 @@ let fechaInput = document.getElementById("fecha").value;
 let f = fechaInput ? new Date(fechaInput) : new Date();
 let esMiercoles = f.getDay() === 3;
 
-let precioAdulto = esMiercoles ? 20000 : 25000;
-let precioNino = esMiercoles ? 10000 : 15000;
+let precioAdulto = esMiercoles ? 15000 : 25000;
+let precioNino = esMiercoles ? 8000 : 15000;
 
 let total = (adultos * precioAdulto) + (ninos * precioNino);
 
