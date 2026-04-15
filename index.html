@@ -213,8 +213,8 @@ return n.toLocaleString("es-CO");
 
 function comprar(){
 let nombre = document.getElementById("nombre").value;
-let adultos = parseInt(document.getElementById("adultos").value) || 0;
-let ninos = parseInt(document.getElementById("ninos").value) || 0;
+let adultos = Math.max(0, parseInt(document.getElementById("adultos").value) || 0);
+let ninos = Math.max(0, parseInt(document.getElementById("ninos").value) || 0);
 
 // VALIDACIONES
 if(!nombre){
