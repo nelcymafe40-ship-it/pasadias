@@ -181,10 +181,10 @@ window.open("https://wa.me/573113822023?text="+encodeURIComponent(mensaje));
 
 // barra
 let mensajes=[
-"📞 Atención al cliente:311-382-2023 (toca aquí)",
+"📞 Atención al cliente (toca aquí)",
 "🌿 Bienvenido a Ventana al Llano",
 "🔥 Aprovecha nuestros pasadías",
-"💳 Pagos fáciles, aceptamos nequi, Bancolombia y bre-b",
+"💳 Pagos fáciles",
 "🎟 Reserva aquí"
 ];
 
@@ -217,8 +217,9 @@ promoTexto.innerHTML=promoActiva
 // COMPRA
 function comprar(){
 
-let a=parseInt(adultos.value)||0;
-let ni=parseInt(ninos.value)||0;
+// ✅ CORRECCIÓN IMPORTANTE (NO NEGATIVOS)
+let a = Math.max(0, parseInt(adultos.value) || 0);
+let ni = Math.max(0, parseInt(ninos.value) || 0);
 
 let pa=promoActiva?20000:25000;
 let pn=promoActiva?10000:15000;
@@ -270,7 +271,6 @@ let n=nombre.value,f=fecha.value,a=adultos.value,ni=ninos.value;
 
 let tipo = promoActiva ? "PROMO MIÉRCOLES" : "TARIFA NORMAL";
 
-// QR reserva
 let infoQR =
 "Hotel Ventana al Llano\n"+
 "Cliente: "+n+"\n"+
@@ -280,7 +280,6 @@ let infoQR =
 "Total: $"+formatear(total)+"\n"+
 "Tipo: "+tipo;
 
-// QR pago
 let pagoQR =
 "PAGO - Hotel Ventana al Llano\n\n"+
 "Total: $"+formatear(total)+"\n\n"+
@@ -323,7 +322,6 @@ ${n}<br>${f}<br><br>
 
 </div>`;
 
-// QRs
 new QRCode(document.getElementById("qr"),{
 text: infoQR,
 width:120,
@@ -335,15 +333,6 @@ text: pagoQR,
 width:120,
 height:120
 });
-
-// 🔥 AQUÍ VOLVIÓ LO QUE TE FALTABA
-let mensajeWA = encodeURIComponent(
-"Hola, ya realicé el pago. Adjunto el comprobante en este chat."
-);
-
-setTimeout(() => {
-window.open("https://wa.me/573113822023?text=" + mensajeWA, "_blank");
-}, 1500);
 
 }
 
