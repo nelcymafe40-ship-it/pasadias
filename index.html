@@ -7,16 +7,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
+
 body{
-font-family: Arial;
+font-family: 'Segoe UI', sans-serif;
 text-align:center;
-background:#f0f4f3;
 margin:0;
+background: linear-gradient(135deg, #d4fc79, #96e6a1);
 }
 
 /* 🔥 BARRA DINÁMICA */
 .soporte{
-background: linear-gradient(90deg, #25D366, #1ebea5);
+background: linear-gradient(90deg, #11998e, #38ef7d);
 color:white;
 padding:12px;
 font-weight:bold;
@@ -25,6 +26,8 @@ top:0;
 width:100%;
 overflow:hidden;
 white-space:nowrap;
+font-size:14px;
+z-index:1000;
 }
 
 .soporte span{
@@ -38,57 +41,90 @@ animation: mover 12s linear infinite;
 100% { transform: translateX(-100%); }
 }
 
+/* CONTENEDOR */
 .container{
-margin-top:100px;
+margin-top:120px;
 }
 
+/* LOGO */
 .logo{
-width:280px;
-margin:10px;
+width:220px;
+margin-bottom:15px;
 }
 
+/* TARJETA */
 .card{
-background:white;
-padding:20px;
-border-radius:15px;
-box-shadow:0px 5px 15px rgba(0,0,0,0.2);
+background: rgba(255,255,255,0.9);
+backdrop-filter: blur(10px);
+padding:25px;
+border-radius:20px;
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
 display:inline-block;
+width:280px;
+transition:0.3s;
 }
 
+.card:hover{
+transform: translateY(-5px);
+}
+
+/* INPUTS */
 input{
-padding:10px;
+padding:12px;
 margin:8px;
-width:200px;
-border-radius:8px;
-border:1px solid #ccc;
+width:90%;
+border-radius:10px;
+border:none;
+outline:none;
+background:#f1f1f1;
+font-size:14px;
 }
 
+/* BOTÓN */
 button{
 padding:12px;
-margin-top:10px;
-background:#2e7d32;
+margin-top:12px;
+background: linear-gradient(90deg, #00c853, #64dd17);
 color:white;
 border:none;
-border-radius:8px;
+border-radius:10px;
 cursor:pointer;
+font-weight:bold;
+transition:0.3s;
 }
 
+button:hover{
+transform: scale(1.05);
+}
+
+/* FACTURA */
 .factura{
 margin-top:20px;
 background:white;
 padding:20px;
-border-radius:10px;
+border-radius:15px;
+box-shadow:0 5px 15px rgba(0,0,0,0.15);
+animation: aparecer 0.5s ease;
 }
 
+/* PASE */
 .pase{
 background:white;
-border:3px dashed black;
+border-radius:15px;
 padding:25px;
 margin-top:20px;
 display:inline-block;
 width:320px;
+box-shadow:0 5px 20px rgba(0,0,0,0.2);
+animation: aparecer 0.5s ease;
 }
 
+@keyframes aparecer{
+from{opacity:0; transform:translateY(20px);}
+to{opacity:1; transform:translateY(0);}
+}
+
+/* ALERTA */
 .alerta{
 background:#ffeb3b;
 padding:10px;
@@ -97,6 +133,7 @@ margin-bottom:10px;
 font-weight:bold;
 }
 
+/* PROMO */
 .promo{
 background:#e8f5e9;
 padding:12px;
@@ -104,6 +141,20 @@ border-radius:10px;
 margin-top:10px;
 color:#1b5e20;
 font-weight:bold;
+}
+
+/* BOTÓN WHATSAPP */
+.whatsapp{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#25D366;
+color:white;
+padding:15px;
+border-radius:50%;
+font-size:20px;
+box-shadow:0 5px 10px rgba(0,0,0,0.3);
+text-decoration:none;
 }
 
 #qr{
@@ -115,12 +166,13 @@ body * { visibility: hidden; }
 .pase, .pase * { visibility: visible; }
 .pase { position:absolute; top:0; left:0; width:100%; }
 }
+
 </style>
 </head>
 
 <body onload="verificarHoy()">
 
-<!-- 🔥 BARRA ANIMADA -->
+<!-- 🔥 BARRA -->
 <div class="soporte">
 <span id="textoSoporte"></span>
 </div>
@@ -158,15 +210,18 @@ Niños:<br>
 
 </div>
 
+<!-- BOTÓN WHATSAPP -->
+<a href="https://wa.me/573113822023" class="whatsapp">💬</a>
+
 <script>
 
-// 🔥 MENSAJES DINÁMICOS
+// 🔥 MENSAJES
 let mensajes = [
 "📞 Atención 24/7: 311 382 2023",
 "🌿 Bienvenido a Hotel Ventana al Llano",
 "🔥 Promo Miércoles: Adultos $20.000 | Niños $10.000",
 "💳 Aceptamos Nequi, Bancolombia y BRE",
-"🎟 Compra tu pasadía fácil y rápido aquí",
+"🎟 Reserva fácil y rápida aquí",
 "📲 Envía tu comprobante por WhatsApp"
 ];
 
@@ -180,8 +235,6 @@ index = (index + 1) % mensajes.length;
 setInterval(cambiarMensaje, 4000);
 cambiarMensaje();
 
-
-// formato colombiano
 function formatear(numero){
 return numero.toLocaleString("es-CO");
 }
@@ -236,28 +289,17 @@ document.getElementById("factura").innerHTML=
 "<h3>Resumen de Reserva</h3>"+
 "Cliente: "+nombre+"<br>"+
 "Fecha: "+fecha+"<br>"+
-"Adulto: $"+formatear(precioAdulto)+"<br>"+
-"Niño: $"+formatear(precioNino)+"<br>"+
 "<strong>Total: $"+formatear(total)+"</strong><br><br>"+
 
 "<div class='promo'>"+
 "🔒 Pago seguro<br><br>"+
-
-"<strong>Nequi:</strong><br>"+
-"321 277 3549<br><br>"+
-
-"<strong>Bancolombia:</strong><br>"+
-"84.943.216.770<br>"+
-"Oneida Beltran<br>"+
-"Cc: 35.285.659<br><br>"+
-
-"<strong>Llave BRE:</strong><br>"+
-"86065356"+
-
+"Nequi: 3212773549<br>"+
+"Bancolombia: 84943216770<br>"+
+"Oneida Beltran<br><br>"+
+"BRE: 86065356"+
 "</div><br>"+
 
 "<input type='file' id='comprobante'><br>"+
-
 "<button onclick='confirmar("+total+")'>Confirmar Pago</button>"+
 "</div>";
 }
@@ -271,33 +313,15 @@ return;
 
 let nombre=document.getElementById("nombre").value;
 let fecha=document.getElementById("fecha").value;
-let adultos=document.getElementById("adultos").value;
-let ninos=document.getElementById("ninos").value;
-
 let codigo=Math.floor(Math.random()*900000+100000);
 
-guardarReserva(codigo,{
-nombre,fecha,adultos,ninos,total,estado:"activo"
-});
+guardarReserva(codigo,{nombre,fecha,total});
 
-let tipoTarifa = promoActiva ? "PROMOCIÓN MIÉRCOLES" : "Tarifa normal";
-
-let mensaje="Hola 👋✨%0A%0A"+
-"He realizado el pago en *Hotel Ventana al Llano* 🌿%0A%0A"+
-"👤 "+nombre+"%0A"+
-"📅 "+fecha+"%0A%0A"+
-"👥 Adultos: "+adultos+" ($"+formatear(promoActiva?20000:25000)+")%0A"+
-"👶 Niños: "+ninos+" ($"+formatear(promoActiva?10000:15000)+")%0A"+
-"🎟 "+tipoTarifa+"%0A%0A"+
-"💰 Total: $"+formatear(total)+"%0A%0A"+
-"Adjunto comprobante 🙌";
-
-window.open("https://wa.me/573113822023?text="+mensaje);
+window.open("https://wa.me/573113822023");
 
 document.getElementById("pase").innerHTML=
 "<div class='pase'>"+
-"<img src='logo.png' width='200'><br>"+
-"<h3>PASE OFICIAL</h3>"+
+"<h3>🎟 PASE VIP</h3>"+
 "Cliente: "+nombre+"<br>"+
 "Fecha: "+fecha+"<br>"+
 "Código: "+codigo+"<br>"+
