@@ -1,13 +1,11 @@
-from IPython.display import HTML
-
-app_code = """
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <title>Calculadora de Derivadas Pro</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
@@ -15,23 +13,25 @@ app_code = """
     <script src="https://unpkg.com/lucide@0.263.0"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
-        .glass-card { 
-            background: rgba(30, 41, 59, 0.7); 
-            backdrop-filter: blur(12px); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .math-font { font-family: 'Cambria Math', 'serif'; font-style: italic; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
+        const { useState, useEffect } = React;
         const { motion, AnimatePresence } = FramerMotion;
-
-        // --- COMPONENTES MENORES ---
 
         const Header = () => (
             <header className="mb-8 text-center">
@@ -41,14 +41,15 @@ app_code = """
                     </div>
                 </div>
                 <h1 className="text-3xl font-bold tracking-tight text-white">Calculadora de Derivadas</h1>
-                <p className="text-slate-400 mt-2">Cálculo simbólico profesional con Math.js</p>
+                <p className="text-slate-400 mt-2">Cálculo simbólico profesional</p>
             </header>
         );
 
         const ErrorMessage = ({ message }) => (
-            <motion.div 
-                initial={{ opacity: 0, y: -10 }} 
+            <motion.div
+                initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
                 className="bg-red-500/10 border border-red-500/50 p-4 rounded-xl flex items-center gap-3 text-red-400 mb-6"
             >
                 <i data-lucide="alert-circle" className="w-5 h-5"></i>
@@ -57,24 +58,23 @@ app_code = """
         );
 
         const ResultCard = ({ expression, result, onCopy }) => (
-            <motion.div 
+            <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="glass-card p-6 rounded-2xl border-l-4 border-l-blue-500 shadow-xl"
             >
                 <div className="flex justify-between items-start mb-4">
                     <span className="text-xs font-bold uppercase tracking-widest text-blue-400">Resultado</span>
-                    <button 
+                    <button
                         onClick={() => onCopy(result)}
                         className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                        title="Copiar resultado"
                     >
                         <i data-lucide="copy" className="w-4 h-4 text-slate-400"></i>
                     </button>
                 </div>
                 <div className="space-y-4">
                     <div>
-                        <p className="text-slate-500 text-xs mb-1">Función original f(x):</p>
+                        <p className="text-slate-500 text-xs mb-1">Función f(x):</p>
                         <p className="text-lg math-font text-slate-200">{expression}</p>
                     </div>
                     <div className="h-px bg-white/5 w-full"></div>
@@ -86,9 +86,7 @@ app_code = """
             </motion.div>
         );
 
-        // --- COMPONENTE PRINCIPAL ---
-
-        const CalculatorApp = () => {
+        const App = () => {
             const [input, setInput] = useState('');
             const [result, setResult] = useState(null);
             const [error, setError] = useState(null);
@@ -98,135 +96,68 @@ app_code = """
                 lucide.createIcons();
             }, [result, error, history]);
 
-            const calculateDerivative = () => {
+            const handleDerive = () => {
                 if (!input.trim()) return;
                 try {
                     setError(null);
-                    // Usar math.js para derivar simbólicamente
                     const derivative = math.derivative(input, 'x').toString();
                     const simplified = math.simplify(derivative).toString();
-                    
                     setResult(simplified);
                     setHistory(prev => [{f: input, df: simplified}, ...prev].slice(0, 5));
                 } catch (err) {
-                    setError("Expresión no válida. Revisa los paréntesis o sintaxis (ej: x^2 + sin(x))");
+                    setError("Error en la expresión. Ejemplo: x^2 + sin(x)");
                     setResult(null);
                 }
             };
 
-            const clearAll = () => {
-                setInput('');
-                setResult(null);
-                setError(null);
-            };
-
             const copyToClipboard = (text) => {
                 navigator.clipboard.writeText(text);
-                alert("¡Copiado al portapapeles!");
             };
 
-            const quickExamples = ["x^3 + 5x^2 - 4", "sin(x) * cos(x)", "log(x) + e^x", "tan(2x^2)"];
-
             return (
-                <div className="min-h-screen p-4 md:p-8 flex flex-col items-center">
+                <div className="min-h-screen p-6 flex flex-col items-center">
                     <div className="w-full max-w-2xl">
                         <Header />
-                        
-                        <div className="glass-card p-6 md:p-8 rounded-3xl shadow-2xl mb-8">
-                            <div className="relative mb-6">
-                                <label className="block text-sm font-medium text-slate-400 mb-2 ml-1">Ingresa la función</label>
-                                <input 
-                                    type="text"
-                                    value={input}
-                                    onChange={(e) => setInput(e.target.value)}
-                                    placeholder="f(x) = ..."
-                                    className="w-full bg-slate-900/50 border border-slate-700 text-white rounded-xl px-5 py-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none text-lg math-font"
-                                    onKeyDown={(e) => e.key === 'Enter' && calculateDerivative()}
-                                />
-                                {input && (
-                                    <button 
-                                        onClick={clearAll}
-                                        className="absolute right-4 top-10 text-slate-500 hover:text-white transition-colors"
-                                    >
-                                        <i data-lucide="x-circle" className="w-5 h-5"></i>
-                                    </button>
-                                )}
-                            </div>
-
-                            <div className="flex flex-wrap gap-3 mb-8">
-                                <button 
-                                    onClick={calculateDerivative}
-                                    className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition-all active:scale-95 shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2"
-                                >
-                                    <i data-lucide="zap" className="w-5 h-5"></i> Derivar Función
-                                </button>
-                            </div>
-
-                            <div className="mb-4">
-                                <p className="text-xs text-slate-500 mb-3 uppercase tracking-tighter font-bold text-center">Ejemplos Rápidos</p>
-                                <div className="grid grid-cols-2 gap-2">
-                                    {quickExamples.map((ex, i) => (
-                                        <button 
-                                            key={i}
-                                            onClick={() => setInput(ex)}
-                                            className="text-xs bg-slate-800/50 hover:bg-slate-700 text-slate-300 py-2 px-3 rounded-lg border border-white/5 transition-colors text-left truncate"
-                                        >
-                                            {ex}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
+                        <div className="glass-card p-6 rounded-3xl shadow-2xl mb-8">
+                            <input
+                                type="text"
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                placeholder="Escribe tu función..."
+                                className="w-full bg-slate-900/50 border border-slate-700 text-white rounded-xl px-5 py-4 mb-4 focus:ring-2 focus:ring-blue-500 outline-none text-lg math-font"
+                                onKeyDown={(e) => e.key === 'Enter' && handleDerive()}
+                            />
+                            <button
+                                onClick={handleDerive}
+                                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2"
+                            >
+                                <i data-lucide="zap" className="w-5 h-5"></i> Derivar
+                            </button>
                         </div>
 
                         <AnimatePresence>
                             {error && <ErrorMessage message={error} />}
-                            {result && (
-                                <ResultCard 
-                                    expression={input} 
-                                    result={result} 
-                                    onCopy={copyToClipboard} 
-                                />
-                            )}
+                            {result && <ResultCard expression={input} result={result} onCopy={copyToClipboard} />}
                         </AnimatePresence>
 
                         {history.length > 0 && (
-                            <div className="mt-12">
-                                <h3 className="text-sm font-bold text-slate-500 uppercase mb-4 flex items-center gap-2">
-                                    <i data-lucide="history" className="w-4 h-4"></i> Historial Reciente
-                                </h3>
-                                <div className="space-y-3">
-                                    {history.map((item, idx) => (
-                                        <div key={idx} className="glass-card p-4 rounded-xl text-sm flex justify-between items-center group">
-                                            <div className="truncate mr-4">
-                                                <span className="text-slate-500">d/dx </span>
-                                                <span className="math-font text-slate-300">({item.f})</span>
-                                                <span className="text-blue-500 mx-2">=</span>
-                                                <span className="math-font text-white">{item.df}</span>
-                                            </div>
-                                            <button 
-                                                onClick={() => setInput(item.f)}
-                                                className="opacity-0 group-hover:opacity-100 p-2 hover:bg-white/10 rounded-lg transition-all"
-                                            >
-                                                <i data-lucide="refresh-cw" className="w-3 h-3 text-slate-400"></i>
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
+                            <div className="mt-8">
+                                <h3 className="text-slate-500 text-xs font-bold uppercase mb-4 tracking-widest">Historial</h3>
+                                {history.map((h, i) => (
+                                    <div key={i} className="glass-card p-3 rounded-lg mb-2 text-sm flex justify-between items-center">
+                                        <span className="truncate text-slate-300 math-font">d/dx({h.f}) = {h.df}</span>
+                                        <button onClick={() => setInput(h.f)} className="text-blue-400 hover:text-white">Usar</button>
+                                    </div>
+                                ))}
                             </div>
                         )}
                     </div>
-                    <footer className="mt-auto py-8 text-slate-600 text-xs">
-                        Calculadora Académica Pro &copy; 2026 - Math.js Engine
-                    </footer>
                 </div>
             );
         };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<CalculatorApp />);
+        root.render(<App />);
     </script>
 </body>
 </html>
-"""
-
-HTML(app_code)
