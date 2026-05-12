@@ -1,336 +1,232 @@
+from IPython.display import HTML
+
+app_code = """
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Hotel Ventana al Llano</title>
-
-<style>
-body{
-font-family:'Segoe UI',sans-serif;
-text-align:center;
-margin:0;
-background:linear-gradient(135deg,#d4fc79,#96e6a1);
-}
-
-.soporte{
-background:linear-gradient(90deg,#11998e,#38ef7d);
-color:white;
-padding:12px;
-position:fixed;
-top:0;
-width:100%;
-overflow:hidden;
-white-space:nowrap;
-z-index:999;
-}
-
-.soporte span{
-display:inline-block;
-padding-left:100%;
-animation:mover 25s linear infinite;
-}
-
-@keyframes mover{
-0%{transform:translateX(100%);}
-100%{transform:translateX(-100%);}
-}
-
-.container{
-margin-top:120px;
-}
-
-.logo{
-width:230px;
-margin-bottom:10px;
-}
-
-.card{
-background:white;
-padding:25px;
-border-radius:20px;
-box-shadow:0 10px 30px rgba(0,0,0,0.2);
-display:inline-block;
-width:340px;
-}
-
-input{
-padding:12px;
-margin:8px 0;
-width:90%;
-border-radius:10px;
-border:none;
-background:#f1f1f1;
-}
-
-button{
-padding:12px;
-margin-top:12px;
-background:linear-gradient(90deg,#00c853,#64dd17);
-color:white;
-border:none;
-border-radius:10px;
-cursor:pointer;
-width:100%;
-font-weight:bold;
-}
-
-.factura{
-margin-top:20px;
-background:white;
-padding:15px;
-border-radius:15px;
-border:2px dashed #00c853;
-text-align:left;
-}
-
-.promo{
-background:#00c853;
-color:white;
-padding:12px;
-border-radius:10px;
-font-weight:bold;
-text-align:center;
-margin:10px 0;
-}
-
-.pagos{
-background:#f7fff7;
-padding:15px;
-border-radius:12px;
-margin-top:10px;
-font-size:14px;
-}
-
-.codigo{
-background:#000;
-color:#00ff88;
-padding:10px;
-border-radius:8px;
-text-align:center;
-font-weight:bold;
-margin-top:10px;
-}
-
-.whatsapp{
-position:fixed;
-bottom:20px;
-right:20px;
-background:#25D366;
-color:white;
-padding:15px;
-border-radius:50%;
-text-decoration:none;
-font-size:20px;
-}
-
-.instagram{
-position:fixed;
-bottom:80px;
-right:20px;
-background:#E1306C;
-color:white;
-padding:12px 15px;
-border-radius:30px;
-text-decoration:none;
-font-weight:bold;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/mathjs@11.8.0/lib/browser/math.js"></script>
+    <script src="https://unpkg.com/lucide@0.263.0"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .glass-card { 
+            background: rgba(30, 41, 59, 0.7); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+        .math-font { font-family: 'Cambria Math', 'serif'; font-style: italic; }
+    </style>
 </head>
-
 <body>
+    <div id="root"></div>
 
-<div class="soporte">
-<span id="textoSoporte"></span>
-</div>
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+        const { motion, AnimatePresence } = FramerMotion;
 
-<div class="container">
+        // --- COMPONENTES MENORES ---
 
-<img src="logo.jpg" class="logo">
+        const Header = () => (
+            <header className="mb-8 text-center">
+                <div className="flex justify-center mb-4">
+                    <div className="p-3 bg-blue-600 rounded-2xl shadow-lg shadow-blue-500/20">
+                        <i data-lucide="function-square" className="text-white w-8 h-8"></i>
+                    </div>
+                </div>
+                <h1 className="text-3xl font-bold tracking-tight text-white">Calculadora de Derivadas</h1>
+                <p className="text-slate-400 mt-2">Cálculo simbólico profesional con Math.js</p>
+            </header>
+        );
 
-<div class="card">
+        const ErrorMessage = ({ message }) => (
+            <motion.div 
+                initial={{ opacity: 0, y: -10 }} 
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-red-500/10 border border-red-500/50 p-4 rounded-xl flex items-center gap-3 text-red-400 mb-6"
+            >
+                <i data-lucide="alert-circle" className="w-5 h-5"></i>
+                <span className="text-sm font-medium">{message}</span>
+            </motion.div>
+        );
 
-<h2>Compra tu Pasadía "HOTEL VENTANA AL LLANO" 🌿</h2>
+        const ResultCard = ({ expression, result, onCopy }) => (
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="glass-card p-6 rounded-2xl border-l-4 border-l-blue-500 shadow-xl"
+            >
+                <div className="flex justify-between items-start mb-4">
+                    <span className="text-xs font-bold uppercase tracking-widest text-blue-400">Resultado</span>
+                    <button 
+                        onClick={() => onCopy(result)}
+                        className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                        title="Copiar resultado"
+                    >
+                        <i data-lucide="copy" className="w-4 h-4 text-slate-400"></i>
+                    </button>
+                </div>
+                <div className="space-y-4">
+                    <div>
+                        <p className="text-slate-500 text-xs mb-1">Función original f(x):</p>
+                        <p className="text-lg math-font text-slate-200">{expression}</p>
+                    </div>
+                    <div className="h-px bg-white/5 w-full"></div>
+                    <div>
+                        <p className="text-blue-400 text-xs mb-1 font-semibold">Derivada f'(x):</p>
+                        <p className="text-2xl math-font text-white break-words">{result}</p>
+                    </div>
+                </div>
+            </motion.div>
+        );
 
-<input type="text" id="nombre" placeholder="Nombre completo">
+        // --- COMPONENTE PRINCIPAL ---
 
-<label><b>Fecha de visita</b></label>
-<input type="date" id="fecha" onchange="verificarPromo()">
+        const CalculatorApp = () => {
+            const [input, setInput] = useState('');
+            const [result, setResult] = useState(null);
+            const [error, setError] = useState(null);
+            const [history, setHistory] = useState([]);
 
-<div id="promoTexto"></div>
+            useEffect(() => {
+                lucide.createIcons();
+            }, [result, error, history]);
 
-<label><b>¿Cuántos pasadías de ADULTO deseas comprar?</b></label>
-<input type="number" id="adultos" value="0" min="0">
+            const calculateDerivative = () => {
+                if (!input.trim()) return;
+                try {
+                    setError(null);
+                    // Usar math.js para derivar simbólicamente
+                    const derivative = math.derivative(input, 'x').toString();
+                    const simplified = math.simplify(derivative).toString();
+                    
+                    setResult(simplified);
+                    setHistory(prev => [{f: input, df: simplified}, ...prev].slice(0, 5));
+                } catch (err) {
+                    setError("Expresión no válida. Revisa los paréntesis o sintaxis (ej: x^2 + sin(x))");
+                    setResult(null);
+                }
+            };
 
-<label><b>¿Cuántos pasadías de NIÑOS deseas comprar?</b></label>
-<input type="number" id="ninos" value="0" min="0">
+            const clearAll = () => {
+                setInput('');
+                setResult(null);
+                setError(null);
+            };
 
-<button onclick="comprar()">Calcular total</button>
+            const copyToClipboard = (text) => {
+                navigator.clipboard.writeText(text);
+                alert("¡Copiado al portapapeles!");
+            };
 
-<div id="factura"></div>
+            const quickExamples = ["x^3 + 5x^2 - 4", "sin(x) * cos(x)", "log(x) + e^x", "tan(2x^2)"];
 
-</div>
-</div>
+            return (
+                <div className="min-h-screen p-4 md:p-8 flex flex-col items-center">
+                    <div className="w-full max-w-2xl">
+                        <Header />
+                        
+                        <div className="glass-card p-6 md:p-8 rounded-3xl shadow-2xl mb-8">
+                            <div className="relative mb-6">
+                                <label className="block text-sm font-medium text-slate-400 mb-2 ml-1">Ingresa la función</label>
+                                <input 
+                                    type="text"
+                                    value={input}
+                                    onChange={(e) => setInput(e.target.value)}
+                                    placeholder="f(x) = ..."
+                                    className="w-full bg-slate-900/50 border border-slate-700 text-white rounded-xl px-5 py-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none text-lg math-font"
+                                    onKeyDown={(e) => e.key === 'Enter' && calculateDerivative()}
+                                />
+                                {input && (
+                                    <button 
+                                        onClick={clearAll}
+                                        className="absolute right-4 top-10 text-slate-500 hover:text-white transition-colors"
+                                    >
+                                        <i data-lucide="x-circle" className="w-5 h-5"></i>
+                                    </button>
+                                )}
+                            </div>
 
-<a href="https://www.instagram.com/ecocabanasventanallano"
-class="instagram" target="_blank">📷</a>
+                            <div className="flex flex-wrap gap-3 mb-8">
+                                <button 
+                                    onClick={calculateDerivative}
+                                    className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition-all active:scale-95 shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2"
+                                >
+                                    <i data-lucide="zap" className="w-5 h-5"></i> Derivar Función
+                                </button>
+                            </div>
 
-<a href="#" onclick="abrirWhatsApp()" class="whatsapp">💬</a>
+                            <div className="mb-4">
+                                <p className="text-xs text-slate-500 mb-3 uppercase tracking-tighter font-bold text-center">Ejemplos Rápidos</p>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {quickExamples.map((ex, i) => (
+                                        <button 
+                                            key={i}
+                                            onClick={() => setInput(ex)}
+                                            className="text-xs bg-slate-800/50 hover:bg-slate-700 text-slate-300 py-2 px-3 rounded-lg border border-white/5 transition-colors text-left truncate"
+                                        >
+                                            {ex}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
 
-<script>
+                        <AnimatePresence>
+                            {error && <ErrorMessage message={error} />}
+                            {result && (
+                                <ResultCard 
+                                    expression={input} 
+                                    result={result} 
+                                    onCopy={copyToClipboard} 
+                                />
+                            )}
+                        </AnimatePresence>
 
-let mensajes=[
-"🌿 Bienvenido a Hotel Ventana al Llano",
-"🎟 Reserva tu pasadía aquí",
-"💳 Pagos por Nequi, Bancolombia y Llave",
-"🔥 Promociones todos los miércoles",
-"🍽️ Los lunes no manejamos servicio de restaurante",
-"📞 Atención por WhatsApp ¡TE ESPERAMOS!"
-];
+                        {history.length > 0 && (
+                            <div className="mt-12">
+                                <h3 className="text-sm font-bold text-slate-500 uppercase mb-4 flex items-center gap-2">
+                                    <i data-lucide="history" className="w-4 h-4"></i> Historial Reciente
+                                </h3>
+                                <div className="space-y-3">
+                                    {history.map((item, idx) => (
+                                        <div key={idx} className="glass-card p-4 rounded-xl text-sm flex justify-between items-center group">
+                                            <div className="truncate mr-4">
+                                                <span className="text-slate-500">d/dx </span>
+                                                <span className="math-font text-slate-300">({item.f})</span>
+                                                <span className="text-blue-500 mx-2">=</span>
+                                                <span className="math-font text-white">{item.df}</span>
+                                            </div>
+                                            <button 
+                                                onClick={() => setInput(item.f)}
+                                                className="opacity-0 group-hover:opacity-100 p-2 hover:bg-white/10 rounded-lg transition-all"
+                                            >
+                                                <i data-lucide="refresh-cw" className="w-3 h-3 text-slate-400"></i>
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    <footer className="mt-auto py-8 text-slate-600 text-xs">
+                        Calculadora Académica Pro &copy; 2026 - Math.js Engine
+                    </footer>
+                </div>
+            );
+        };
 
-let i=0;
-function cambiarMensaje(){
-textoSoporte.innerText=mensajes[i];
-i=(i+1)%mensajes.length;
-}
-setInterval(cambiarMensaje,4000);
-cambiarMensaje();
-
-function verificarPromo(){
-let fecha=document.getElementById("fecha").value;
-let f=fecha?new Date(fecha):new Date();
-
-if(f.getDay()===3){
-promoTexto.innerHTML=`
-<div class="promo">
-🔥 PROMOCIÓN DÍA DE HOY MIÉRCOLES 🔥
-</div>`;
-}else{
-promoTexto.innerHTML="";
-}
-}
-
-function formatear(n){
-return n.toLocaleString("es-CO");
-}
-
-function generarCodigo(){
-return "RV-"+Math.floor(100000+Math.random()*900000);
-}
-
-function comprar(){
-
-let nombre=document.getElementById("nombre").value;
-let adultos=parseInt(document.getElementById("adultos").value);
-let ninos=parseInt(document.getElementById("ninos").value);
-
-adultos=isNaN(adultos)?0:adultos;
-ninos=isNaN(ninos)?0:ninos;
-
-if(!nombre){
-alert("Escribe tu nombre");
-return;
-}
-
-if(adultos===0 && ninos===0){
-alert("Debes seleccionar al menos 1 pasadía");
-return;
-}
-
-let fecha=document.getElementById("fecha").value;
-let f=fecha?new Date(fecha):new Date();
-
-let esMiercoles=f.getDay()===3;
-
-let precioAdulto=esMiercoles?15000:25000;
-let precioNino=esMiercoles?8000:15000;
-
-let total=(adultos*precioAdulto)+(ninos*precioNino);
-
-let codigo=generarCodigo();
-
-factura.innerHTML=`
-<div class="factura">
-
-<b>Resumen de reserva</b><br><br>
-
-Nombre: ${nombre}<br>
-Fecha: ${fecha}<br>
-Adultos: ${adultos}<br>
-Niños: ${ninos}<br>
-
-${esMiercoles?'<div class="promo">PRECIO PROMOCIÓN MIÉRCOLES</div>':''}
-
-<b>Total a pagar: $${formatear(total)}</b>
-
-<div class="pagos">
-<b>Métodos de pago</b><br><br>
-
-<b>Nequi</b><br>
-321 277 3549<br><br>
-
-<b>Bancolombia</b><br>
-84943216770 - Ahorros<br>
-Oneida Beltran<br>
-CC. 35285659<br><br>
-
-<b>Llave BRE</b><br>
-86065356
-</div>
-
-<div class="codigo">
-Código reserva: ${codigo}
-</div>
-
-<button onclick="enviarWhatsApp('${nombre}',${adultos},${ninos},${total},'${codigo}')">
-Confirmar reserva
-</button>
-
-</div>
-`;
-}
-
-function enviarWhatsApp(nombre,adultos,ninos,total,codigo){
-
-let fecha=document.getElementById("fecha").value;
-
-let f=fecha?new Date(fecha):new Date();
-let esMiercoles=f.getDay()===3;
-
-let mensaje=`🌿 RESERVA GENERADA - Hotel Ventana al Llano
-
-Código de reserva: ${codigo}
-
-Nombre: ${nombre}
-Fecha de visita: ${fecha}
-
-Detalle de compra:
-Adultos: ${adultos}
-Niños: ${ninos}
-${esMiercoles ? 'Promoción: Miércoles' : ''}
-
-Total a pagar: $${total}
-ANEXO COMPROBANTE DE PAGO POR ESTE MEDIO, PORFAVOR CONFIRMAR`;
-
-window.open("https://wa.me/573113822023?text="+encodeURIComponent(mensaje));
-}
-
-function abrirWhatsApp(){
-
-let mensajes=[
-"Hola, quiero información sobre los pasadías 🌿",
-"Hola, me gustaría conocer disponibilidad",
-"Buenas, quiero reservar",
-"Hola, vengo desde la página web"
-];
-
-let mensaje=mensajes[Math.floor(Math.random()*mensajes.length)];
-
-window.open("https://wa.me/573113822023?text="+encodeURIComponent(mensaje));
-}
-
-verificarPromo();
-
-</script>
-
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<CalculatorApp />);
+    </script>
 </body>
 </html>
+"""
+
+HTML(app_code)
